@@ -777,6 +777,43 @@ class HistoryDB:
         )
         conn.commit()
 
+    def rating_summary(self) -> dict[str, Any]:
+        """按引擎聚合用户反馈打分分布（NEXT P1-3 消费端：质量报表数据源）。
+
+        Returns:
+            {
+              "by_engine": [{"engine": ..., "rating_1": n, "rating_0": n, "rating_-1": n, "rated": n, "total": n}, ...],
+              "overall": {"rating_1": n, "rating_0": n, "rating_-1": n, "rated": n, "total": n},
+            }
+        """
+        conn = self.conn
+        rows = conn.execute(
+            "SELECT engine, "
+            "SUM(CASE WHEN rating=1 THEN 1 ELSE 0 END) AS r1, "
+            "SUM(CASE WHEN rating=0 THEN 1 ELSE 0 END) AS r0, "
+            "SUM(CASE WHEN rating=-1 THEN 1 ELSE 0 END) AS rn1, "
+            "COUNT(*) AS total FROM tasks GROUP BY engine ORDER BY total DESC"
+        ).fetchall()
+        by_engine = [
+            {
+                "engine": r[0],
+                "rating_1": r[1],
+                "rating_0": r[2],
+                "rating_-1": r[3],
+                "rated": (r[1] + r[3]),
+                "total": r[4],
+            }
+            for r in rows
+        ]
+        overall = {
+            "rating_1": sum(e["rating_1"] for e in by_engine),
+            "rating_0": sum(e["rating_0"] for e in by_engine),
+            "rating_-1": sum(e["rating_-1"] for e in by_engine),
+            "rated": sum(e["rated"] for e in by_engine),
+            "total": sum(e["total"] for e in by_engine),
+        }
+        return {"by_engine": by_engine, "overall": overall}
+
     # ── 输出 CRUD ─────────────────────────────────────────────
     def add_output(
         self,

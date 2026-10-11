@@ -147,6 +147,8 @@ textarea{height:auto}
 .btn:hover{background:var(--surface-3)}
 .btn-primary{background:var(--accent);color:var(--on-accent)}
 .btn-primary:hover{background:var(--accent-deep)}
+/* NEXT P1-3 反馈闭环：赞/踩评分按钮的激活态 */
+.btn.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .btn-ghost{border:1px solid var(--wire);background:var(--surface)}
 .btn-ghost:hover{background:var(--surface-2)}
 .btn-sm{padding:3px 8px;height:23px;font-size:10.5px;border:1px solid var(--wire);background:var(--surface)}

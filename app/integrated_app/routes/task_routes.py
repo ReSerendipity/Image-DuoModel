@@ -138,6 +138,16 @@ async def export_tasks(
     )
 
 
+@router.get("/rating-summary")
+async def rating_summary(request: Request) -> dict[str, Any]:
+    """GET /api/tasks/rating-summary — 用户反馈打分按引擎聚合（NEXT P1-3 消费端）。
+
+    注意：本静态路由必须注册在 ``/{task_id}`` 之前，否则会被动态路由吞掉。
+    """
+    history_db: HistoryDB = request.app.state.history_db
+    return await asyncio.to_thread(history_db.rating_summary)
+
+
 @router.get("/{task_id}")
 async def get_task(task_id: str, request: Request) -> dict[str, Any]:
     """GET /api/tasks/{id} — 任务详情（含 generation_config 22 项 + 三路输出）"""
@@ -146,6 +156,21 @@ async def get_task(task_id: str, request: Request) -> dict[str, Any]:
     if not task:
         raise HTTPException(404, detail=f"Task not found: {task_id}")
     return task
+
+
+@router.post("/{task_id}/rating")
+async def set_task_rating(
+    task_id: str,
+    request: Request,
+    rating: int = Query(0, ge=-1, le=1, description="-1=踩 / 0=未评 / 1=赞"),
+) -> dict[str, Any]:
+    """POST /api/tasks/{id}/rating?rating=1 — 设置用户反馈打分（NEXT P1-3 闭环入口）。"""
+    history_db: HistoryDB = request.app.state.history_db
+    exists = await asyncio.to_thread(history_db.get_task, task_id)
+    if not exists:
+        raise HTTPException(404, detail=f"Task not found: {task_id}")
+    await asyncio.to_thread(history_db.set_rating, task_id, rating)
+    return {"task_id": task_id, "rating": max(-1, min(1, rating))}
 
 
 @router.post("/{task_id}/cancel")

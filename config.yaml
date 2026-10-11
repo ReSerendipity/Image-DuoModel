@@ -518,7 +518,9 @@ security:
     verify_weights: true
     weight_manifest_file: data/weight_manifest.json
     fail_closed_on_corrupt_weight: true
-    allow_unregistered_weights: true
+    # NEXT P0-2（2026-10-11）：清单已按 active-engines-only 重生成并覆盖全部在用
+    # 引用（14 个唯一文件），由 TOFU 起步期收紧为拒绝未登记权重（fail-closed）。
+    allow_unregistered_weights: false
   integrity_selfcheck:
     enabled: true
     manifest_file: app/integrated_app/security/integrity_manifest.json

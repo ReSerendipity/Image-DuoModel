@@ -38,8 +38,10 @@ def test_qwen_image_native_config_well_formed() -> None:
     assert "txt2img" in feats, "qwen_image_native 必须声明 txt2img 能力（NativeEngine 能力守卫依赖此）"
     assert cfg.get("latent_channels") == 64
     assert cfg.get("latent_downscale") == 16
-    # unet 子路径指向本机真实文件（2026-10-02 实证：与 edit 共用同一份 UNET）
-    assert (cfg.get("unet") or {}).get("sub_path") == ("Qwen-Image-2.1/qwen_image_2.1_int8_convrot.safetensors")
+    # unet 子路径指向本机真实文件（2026-10-11 追加工单：用户批准 turbo 替代——
+    # 原 Qwen-Image-2.1/qwen_image_2.1_int8_convrot.safetensors 在 v3.2 库缺失，
+    # 改指真实存在的 Qwen-Image-2.1-turbo/ 档）
+    assert (cfg.get("unet") or {}).get("sub_path") == ("Qwen-Image-2.1-turbo/qwen-image-2.1-turbo-int8-convrot.safetensors")
 
 
 def test_registry_dispatches_native_engine_for_qwen_image(monkeypatch) -> None:

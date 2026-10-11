@@ -94,7 +94,11 @@ models:
         sub_path: Qwen-Image-2.1/qwen3vl_8b_int8_convrot.safetensors
       unet:
         sub_dir: unet
-        sub_path: Qwen-Image-2.1/qwen_image_2.1_int8_convrot.safetensors
+        # NEXT 追加工单（2026-10-11 用户批准 turbo 替代，零下载）：
+        # 原引用 Qwen-Image-2.1/qwen_image_2.1_int8_convrot.safetensors 在 v3.2 库
+        # 中不存在（unet/Qwen-Image-2.1 目录为空）；改指真实存在的
+        # Qwen-Image-2.1-turbo/qwen-image-2.1-turbo-int8-convrot.safetensors。
+        sub_path: Qwen-Image-2.1-turbo/qwen-image-2.1-turbo-int8-convrot.safetensors
       vae:
         sub_dir: vae
         sub_path: Qwen-Image-2.1/qwen_image_2.1_vae_bf16.safetensors
@@ -227,14 +231,12 @@ models:
         sub_path: Qwen-Image-2.1/qwen3vl_8b_int8_convrot.safetensors
       unet:
         sub_dir: unet
-        # GOTCHAS（2026-10-02 实证）：本机 Qwen-Image-2.1 目录下只有这一个 UNET
-        # （qwen_image_edit_native 也用它）。原写 `qwen_image_2.1_base_int8_convrot.safetensors`
-        # 该文件不存在 → preflight 走 SKIPPED(2) 的离线阻断分支。实测
-        # `comfy/ldm/qwen_image21/model.py` 的 QwenImage21Transformer2DModel.forward 里
-        # ref_latents/image_slots 都是**可选**（默认 None），**同一份 UNET 既做 txt2img 也做 edit**，
-        # 区别只在是否传参考图 latent；故这份权重可直接用于文生图。已实跑出图（512²/8 步/euler+simple，
-        # 猫趴木桌，与 prompt 吻合）。
-        sub_path: Qwen-Image-2.1/qwen_image_2.1_int8_convrot.safetensors
+        # NEXT 追加工单（2026-10-11 用户批准 turbo 替代，零下载）：
+        # 原 GOTCHAS（2026-10-02）注释所述权重 qwen_image_2.1_int8_convrot.safetensors
+        # 在 v3.2 库中不存在（unet/Qwen-Image-2.1 目录为空）；改指真实存在的
+        # Qwen-Image-2.1-turbo/qwen-image-2.1-turbo-int8-convrot.safetensors。
+        # 注：同一 UNET 既做 txt2img 也做 edit（ref_latents/image_slots 可选）。
+        sub_path: Qwen-Image-2.1-turbo/qwen-image-2.1-turbo-int8-convrot.safetensors
       vae:
         sub_dir: vae
         sub_path: Qwen-Image-2.1/qwen_image_2.1_vae_bf16.safetensors

@@ -1,6 +1,6 @@
 # Image MultiModel
 
-![Version](https://img.shields.io/badge/version-1.2.2-blue?style=for-the-badge) ![License](https://img.shields.io/badge/license-Apache2.0-green?style=for-the-badge) ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white) ![GPU](https://img.shields.io/badge/GPU-NVIDIA%20CUDA-76B900?style=for-the-badge&logo=nvidia&logoColor=white) [![CI](https://github.com/ReSerendipity/Image_MultiModel/actions/workflows/ci.yml/badge.svg)](https://github.com/ReSerendipity/Image_MultiModel/actions) [![gitleaks](https://img.shields.io/badge/secret%20scan-gitleaks%20passing-0080FF?style=for-the-badge)](https://github.com/ReSerendipity/Image_MultiModel/actions/workflows/gitleaks.yml)
+![Version](https://img.shields.io/badge/version-1.2.2-blue?style=for-the-badge) ![License](https://img.shields.io/badge/license-Apache2.0-green?style=for-the-badge) ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white) ![GPU](https://img.shields.io/badge/GPU-NVIDIA%20CUDA-76B900?style=for-the-badge&logo=nvidia&logoColor=white) [![CI](https://github.com/ReSerendipity/Image-MultiModel/actions/workflows/ci.yml/badge.svg)](https://github.com/ReSerendipity/Image-MultiModel/actions) [![gitleaks](https://img.shields.io/badge/secret%20scan-gitleaks%20passing-0080FF?style=for-the-badge)](https://github.com/ReSerendipity/Image-MultiModel/actions/workflows/gitleaks.yml)
 
 **Image MultiModel — 多模型 AI 图像生成平台：基于进程内原生引擎，复用 ComfyUI 源码接入 Z-Image Turbo / Qwen-Image 2.1 Edit / Flux.2 Klein 的「单页 Web UI」**
 
@@ -14,7 +14,7 @@
 
 *浅色主题 — 生图工作台主页 / 高级参数 / 预设管理 / 历史记录 / 图片展示 / 批量模式*
 
-> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image_MultiModel/)。
+> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image-MultiModel/)。
 
 ---
 
@@ -130,7 +130,7 @@ docker run --gpus all -p 8288:8288 \
 ## 项目结构
 
 ```
-Image_MultiModel/
+Image-MultiModel/
 ├── app/                          # 应用入口与主程序
 │   ├── clean_launch.py          # 启动清理 + 环境检测 + 启动 uvicorn
 │   └── integrated_app/          # 主应用核心
@@ -255,7 +255,7 @@ python -m pytest tests/e2e -m e2e
 
 - 本项目为**独立开源项目**，基于阿里通义实验室（Tongyi-MAI）开源模型 **Z-Image-Turbo**（Apache-2.0）构建，与阿里巴巴集团及通义品牌**无隶属关系**，并非通义官方出品。
 - "Z-Image" 为阿里通义实验室的官方模型品牌名，本项目中仅作**描述性引用**以说明所集成的引擎，不暗示本项目的官方身份或获得官方背书。
-- 项目内置的 SeedVR2 超分组件同为第三方集成，相关归属与免责说明见 [SeedVR2 项目声明](https://github.com/ReSerendipity/SeedVR2-lite)。
+- 项目内置的 SeedVR2 超分组件同为第三方集成，相关归属与免责说明见 [SeedVR2 项目声明](https://github.com/ReSerendipity/SeedVR2-Lite)。
 
 | 模型 | 引擎 key | 权重许可 | 商用 | 说明 |
 |---|---|---|---|---|
@@ -274,4 +274,4 @@ python -m pytest tests/e2e -m e2e
 
 > 🚧 **开发中**：Windows 桌面版正在开发，尚未正式发布。
 
-桌面版将提供安装器与自动更新；正式发布后可从 [GitHub Releases](https://github.com/ReSerendipity/Image_MultiModel/releases) 下载获取，届时在本节补充安装与使用说明。
+桌面版将提供安装器与自动更新；正式发布后可从 [GitHub Releases](https://github.com/ReSerendipity/Image-MultiModel/releases) 下载获取，届时在本节补充安装与使用说明。

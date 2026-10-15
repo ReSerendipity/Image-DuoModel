@@ -20,6 +20,7 @@ from fastapi import APIRouter, Request, Response
 from ..config import get_config
 from ..cost_governance import get_metrics_store
 from ..gpu_utils import get_gpu_info
+from ..history_db import slow_query_stats
 from ..observability.alerts import get_alert_engine, health_unhealthy
 from ..observability.generation_metrics import classify_generation_error
 from ..observability.metrics import get_metrics
@@ -88,6 +89,12 @@ def _refresh_resource_gauges(request: Request) -> None:
             m.disk_free_bytes.set(d["free"])
     except Exception as e:  # noqa: BLE001
         logger.debug("refresh disk gauges failed: %s", e)
+
+    # 慢查询（history_db 模块级计数；v2.9 评估·后端服务设计 P1-1）
+    try:
+        m.db_slow_query_count.set(float(slow_query_stats.get("count", 0)))
+    except Exception as e:  # noqa: BLE001
+        logger.debug("refresh slow query gauge failed: %s", e)
 
 
 @router.get("/metrics/prometheus")

@@ -15,6 +15,7 @@
 症状 → 确认命令 → 影响判断 → 临时缓解 → 回滚/重启 → 数据保护 → 恢复验证 → 升级联系人。
 
 ## 关联文档
+- 演练执行台账（季度 1/4/7/10 月首周）：[drill_ledger.md](drill_ledger.md)
 - 告警规则与阈值：[../ops/alert_rules.md](../ops/alert_rules.md)
 - on-call 与升级：[../ops/oncall.md](../ops/oncall.md)
 - post-mortem 模板：[../ops/post_mortem_template.md](../ops/post_mortem_template.md)

@@ -9,10 +9,9 @@
 
 ## 报告安全漏洞
 
-请**不要**在 GitHub Issues 中公开披露安全漏洞。请通过以下任一方式私下报告：
+请**不要**在 GitHub Issues 中公开披露安全漏洞。请通过 GitHub 的私密渠道私下报告：
 
-- 邮件：ReSerendipity@outlook.com（标题注明 `[SECURITY]`）
-- 或直接创建 [Private vulnerability report](https://github.com/ReSerendipity/Image_MultiModel/security/advisories/new)
+- 直接创建 [Private vulnerability report](https://github.com/ReSerendipity/Image-duoModel/security/advisories/new)（会进入仓库维护者的保密收件箱）
 
 ## 响应时间
 

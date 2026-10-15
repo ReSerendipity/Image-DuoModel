@@ -181,6 +181,10 @@ async def lifespan(app: FastAPI):
     config = get_config()
     app.state.config = config
     setup_logging(config)
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地；幂等，clean_launch 已装则跳过）
+    from .crash_telemetry import install as _install_crash_telemetry
+
+    _install_crash_telemetry(config.project_root)
     logger.info(f"=== Image MultiModel starting (v{config.version}) ===")
     logger.info(f"Project root: {config.project_root}")
     logger.info(f"Model mode: {config.models.model_source_mode}")
@@ -421,6 +425,14 @@ async def lifespan(app: FastAPI):
             except Exception:  # noqa: BLE001
                 llm_tokens_today = 0.0
             llm_token_budget = float(getattr(getattr(cfg, "finops", None), "budget_llm_tokens_per_day", 0) or 0)
+            # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2）
+            crash_recent = 0.0
+            try:
+                from .crash_telemetry import count_crash_reports
+
+                crash_recent = float(count_crash_reports().get("recent", 0))
+            except Exception:  # noqa: BLE001
+                crash_recent = 0.0
             get_alert_engine().evaluate(
                 {
                     "queue_fill_ratio": fill,
@@ -431,6 +443,7 @@ async def lifespan(app: FastAPI):
                     "llm_tokens_today": llm_tokens_today,
                     "llm_token_budget": llm_token_budget,
                     "llm_token_budget_exceeded": bool(llm_token_budget > 0 and llm_tokens_today > llm_token_budget),
+                    "crash_reports_recent": crash_recent,
                     "now": time.time(),
                 }
             )

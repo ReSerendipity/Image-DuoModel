@@ -63,6 +63,7 @@ _RUNBOOK = {
     "disk_full": "docs/runbooks/disk_full.md",
     "generation_failures": "docs/runbooks/generation_failures.md",
     "llm_token_budget": "docs/runbooks/llm_token_budget.md",
+    "crash_reports": "docs/runbooks/crash_reports.md",
 }
 
 
@@ -150,6 +151,18 @@ class AlertEngine:
                     f"超过日预算 {float(s.get('llm_token_budget', 0.0) or 0.0):.0f}"
                 ),
                 "value": lambda s: float(s.get("llm_tokens_today", 0.0) or 0.0),
+            },
+            {
+                "name": "CrashReportsDetected",
+                "severity": "warning",
+                "runbook": _RUNBOOK["crash_reports"],
+                "for_s": 0.0,
+                "check": lambda s: float(s.get("crash_reports_recent", 0.0) or 0.0) > 0.0,
+                "message": lambda s: (
+                    f"24h 内新增崩溃留痕 {float(s.get('crash_reports_recent', 0.0) or 0.0):.0f} 份"
+                    "（会话崩溃率阈值 ≤ 0.1%，处置见 runbook）"
+                ),
+                "value": lambda s: float(s.get("crash_reports_recent", 0.0) or 0.0),
             },
         ]
 

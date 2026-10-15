@@ -97,6 +97,16 @@ def _refresh_resource_gauges(request: Request) -> None:
     except Exception as e:  # noqa: BLE001
         logger.debug("refresh slow query gauge failed: %s", e)
 
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地）
+    try:
+        from ..crash_telemetry import count_crash_reports
+
+        crashes = count_crash_reports()
+        m.crash_reports_total.set(float(crashes.get("total", 0)))
+        m.crash_reports_recent_24h.set(float(crashes.get("recent", 0)))
+    except Exception as e:  # noqa: BLE001
+        logger.debug("refresh crash gauges failed: %s", e)
+
 
 @router.get("/metrics/prometheus")
 async def metrics(request: Request) -> Response:
@@ -149,6 +159,15 @@ def _build_alert_snapshot(request: Request) -> dict[str, Any]:
         llm_tokens_today = 0.0
     llm_token_budget = float(getattr(getattr(cfg, "finops", None), "budget_llm_tokens_per_day", 0) or 0)
 
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2）
+    crash_recent = 0.0
+    try:
+        from ..crash_telemetry import count_crash_reports
+
+        crash_recent = float(count_crash_reports().get("recent", 0))
+    except Exception:  # noqa: BLE001
+        crash_recent = 0.0
+
     return {
         "queue_fill_ratio": fill_ratio,
         "generation_failure_rate": failure_rate,
@@ -158,6 +177,7 @@ def _build_alert_snapshot(request: Request) -> dict[str, Any]:
         "llm_tokens_today": llm_tokens_today,
         "llm_token_budget": llm_token_budget,
         "llm_token_budget_exceeded": bool(llm_token_budget > 0 and llm_tokens_today > llm_token_budget),
+        "crash_reports_recent": crash_recent,
         "now": time.time(),
     }
 

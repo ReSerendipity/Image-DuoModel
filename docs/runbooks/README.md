@@ -10,6 +10,8 @@
 | `GenerationFailureRateHigh` | critical | [generation_failures.md](generation_failures.md) | 生成失败率 >5% 持续 5min |
 | `QueueOverloaded` | warning | [queue_overload.md](queue_overload.md) | 队列填充率 >=85% 持续 5min |
 | `DiskSpaceLow` | critical | [disk_full.md](disk_full.md) | 磁盘可用空间 <15% |
+| `LLMTokenBudgetExceeded` | warning | [llm_token_budget.md](llm_token_budget.md) | LLM Token 用量超过日预算 |
+| `CrashReportsDetected` | warning | [crash_reports.md](crash_reports.md) | 24h 内新增崩溃留痕文件 |
 
 ## 每套 Runbook 必备章节
 症状 → 确认命令 → 影响判断 → 临时缓解 → 回滚/重启 → 数据保护 → 恢复验证 → 升级联系人。

@@ -7,6 +7,9 @@ agent/llm_client.py — OpenAI 兼容 LLM 客户端(本地 llama.cpp / 云 API �
   ``tool_calls`` 是**分片增量**的,必须按 ``index`` 累积合并,这里统一处理;
 - 配置经环境变量注入(.env 由 config._load_dotenv 加载,零 config.yaml 侵入);
 - 健康探测:llama-server 是外部进程,不自动拉起,只探测 + 明确降级;
+- 降级链(v2.9 评估·LLM 应用工程 P1-1):主端点失败(连接/非 200)按指数退避重试,
+  耗尽后自动切换 fallback 端点(fallback_base_url+fallback_model 同时配置才启用);
+  流式在「首个 delta 产出之前」失败才允许切换,已流出后失败直接上抛防重复输出;
 - api_key 绝不进入 system prompt / 日志。
 
 环境变量:
@@ -19,6 +22,7 @@ agent/llm_client.py — OpenAI 兼容 LLM 客户端(本地 llama.cpp / 云 API �
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -45,6 +49,17 @@ class AgentLLMConfig:
     temperature: float = 0.3
     max_tokens: int = 1024
     timeout_s: float = 120.0
+    # ── 降级模型链（v2.9 评估·LLM 应用工程 P1-1）──────────────
+    # 主端点失败（连接失败/非 200）时按指数退避重试，耗尽后切换降级端点。
+    # fallback_base_url 与 fallback_model 同时非空才启用降级链。
+    fallback_base_url: str = ""
+    fallback_api_key: str = "not-needed"
+    fallback_model: str = ""
+    # 每个端点尝试 1 + max_retries 次；退避从 retry_base_delay_s 指数增长，
+    # 封顶 retry_max_delay_s。
+    max_retries: int = 1
+    retry_base_delay_s: float = 0.5
+    retry_max_delay_s: float = 4.0
 
     @classmethod
     def from_env(cls) -> AgentLLMConfig:
@@ -54,6 +69,10 @@ class AgentLLMConfig:
             model=os.environ.get("IMAGE_MM_AGENT_LLM_MODEL", cls.model),
             temperature=float(os.environ.get("IMAGE_MM_AGENT_LLM_TEMPERATURE", cls.temperature)),
             max_tokens=int(os.environ.get("IMAGE_MM_AGENT_LLM_MAX_TOKENS", cls.max_tokens)),
+            fallback_base_url=os.environ.get("IMAGE_MM_AGENT_LLM_FALLBACK_BASE_URL", cls.fallback_base_url),
+            fallback_api_key=os.environ.get("IMAGE_MM_AGENT_LLM_FALLBACK_API_KEY", cls.fallback_api_key),
+            fallback_model=os.environ.get("IMAGE_MM_AGENT_LLM_FALLBACK_MODEL", cls.fallback_model),
+            max_retries=int(os.environ.get("IMAGE_MM_AGENT_LLM_MAX_RETRIES", cls.max_retries)),
         )
 
 
@@ -63,21 +82,58 @@ class LLMClient:
     def __init__(self, config: AgentLLMConfig | None = None) -> None:
         self.config = config or AgentLLMConfig.from_env()
 
-    def _headers(self) -> dict[str, str]:
+    def _headers(self, api_key: str | None = None) -> dict[str, str]:
         return {
-            "Authorization": f"Bearer {self.config.api_key}",
+            "Authorization": f"Bearer {api_key if api_key is not None else self.config.api_key}",
             "Content-Type": "application/json",
         }
 
     async def chat_completion(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> dict[str, Any]:
-        """非流式 chat.completions。返回响应 JSON dict;tools 可传空列表。"""
-        payload = self._payload(messages, tools)
+        """非流式 chat.completions（带端点降级链与指数退避重试）。
+
+        调用链：主端点 → 降级端点（若配置 fallback_base_url+fallback_model）；
+        每个端点尝试 1 + max_retries 次。全部失败时抛 LLMError（携带最后一次
+        错误），由调用方转成 error 事件。
+        """
+        last_err: Exception | None = None
+        endpoints = self._endpoints()
+        for ep_index, (base_url, api_key, model) in enumerate(endpoints):
+            for attempt in range(self.config.max_retries + 1):
+                try:
+                    return await self._chat_completion_once(messages, tools, base_url, api_key, model)
+                except LLMError as exc:
+                    last_err = exc
+                    if attempt < self.config.max_retries:
+                        delay = self._backoff_s(attempt)
+                        logger.warning(
+                            "LLM 调用失败（端点 %d/%s 第 %d 次，%.1fs 后重试）: %s",
+                            ep_index + 1,
+                            base_url,
+                            attempt + 1,
+                            delay,
+                            exc,
+                        )
+                        await asyncio.sleep(delay)
+                    else:
+                        logger.warning("LLM 端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
+        raise LLMError(f"LLM 全部端点不可用（{len(endpoints)} 个）: {last_err}")
+
+    async def _chat_completion_once(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        base_url: str,
+        api_key: str,
+        model: str,
+    ) -> dict[str, Any]:
+        """对单个端点执行一次非流式调用（无重试，重试/降级由 chat_completion 编排）。"""
+        payload = self._payload(messages, tools, model=model)
         try:
             async with httpx.AsyncClient(timeout=self.config.timeout_s) as client:
                 resp = await client.post(
-                    f"{self.config.base_url.rstrip('/')}/chat/completions",
+                    f"{base_url.rstrip('/')}/chat/completions",
                     json=payload,
-                    headers=self._headers(),
+                    headers=self._headers(api_key),
                 )
         except httpx.HTTPError as exc:
             raise LLMError(f"LLM 请求失败: {exc}") from exc
@@ -88,17 +144,59 @@ class LLMClient:
     async def chat_completion_stream(
         self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
     ) -> AsyncIterator[dict[str, Any]]:
-        """流式 chat.completions。
+        """流式 chat.completions（带端点降级链）。
 
         产出两类事件：
         - ``{"type": "delta", "text": <增量文本>}``：仅当分片带 content 时产出；
         - ``{"type": "done", "message": {"content": ..., "tool_calls": [...]}}``：收尾，
           聚合后的完整消息（``tool_calls`` 按 ``index`` 累积合并）。
 
-        失败一律转成 ``LLMError``；已流出的文本由调用方决定是否回滚（本项目的
-        orchestrator 用「泄露命中则整体替换」的策略处理）。
+        失败语义分两段：**首个 delta 产出之前**失败（连接失败/非 200/流建立失败）
+        视为端点不可用，指数退避后重试本端点、耗尽后切换降级端点；**已产出 delta
+        之后**失败则无法安全重放（重放会重复输出已渲染文本），立即抛出 LLMError
+        由调用方兜底（orchestrator 用「泄露命中则整体替换」的策略处理流式文本）。
         """
-        payload = self._payload(messages, tools)
+        last_err: Exception | None = None
+        endpoints = self._endpoints()
+        for ep_index, (base_url, api_key, model) in enumerate(endpoints):
+            for attempt in range(self.config.max_retries + 1):
+                emitted = False
+                try:
+                    async for event in self._stream_once(messages, tools, base_url, api_key, model):
+                        if event.get("type") == "delta":
+                            emitted = True
+                        yield event
+                    return
+                except LLMError as exc:
+                    last_err = exc
+                    if emitted:
+                        # 已有增量流出：重放会重复输出，直接上抛
+                        raise
+                    if attempt < self.config.max_retries:
+                        delay = self._backoff_s(attempt)
+                        logger.warning(
+                            "LLM 流式连接失败（端点 %d/%s 第 %d 次，%.1fs 后重试）: %s",
+                            ep_index + 1,
+                            base_url,
+                            attempt + 1,
+                            delay,
+                            exc,
+                        )
+                        await asyncio.sleep(delay)
+                    else:
+                        logger.warning("LLM 流式端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
+        raise LLMError(f"LLM 全部端点不可用（{len(endpoints)} 个）: {last_err}")
+
+    async def _stream_once(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        base_url: str,
+        api_key: str,
+        model: str,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """对单个端点执行一次流式调用（无重试，重试/降级由 chat_completion_stream 编排）。"""
+        payload = self._payload(messages, tools, model=model)
         payload["stream"] = True
         content_parts: list[str] = []
         tool_calls: dict[int, dict[str, Any]] = {}
@@ -107,9 +205,9 @@ class LLMClient:
             async with httpx.AsyncClient(timeout=self.config.timeout_s) as client:
                 async with client.stream(
                     "POST",
-                    f"{self.config.base_url.rstrip('/')}/chat/completions",
+                    f"{base_url.rstrip('/')}/chat/completions",
                     json=payload,
-                    headers=self._headers(),
+                    headers=self._headers(api_key),
                 ) as resp:
                     if resp.status_code != 200:
                         body = (await resp.aread()).decode("utf-8", errors="replace")
@@ -134,9 +232,14 @@ class LLMClient:
         yield {"type": "done", "message": message}
 
     # ── 内部工具 ────────────────────────────────────────────
-    def _payload(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> dict[str, Any]:
+    def _payload(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        model: str | None = None,
+    ) -> dict[str, Any]:
         payload: dict[str, Any] = {
-            "model": self.config.model,
+            "model": model or self.config.model,
             "messages": messages,
             "temperature": self.config.temperature,
             "max_tokens": self.config.max_tokens,
@@ -144,6 +247,22 @@ class LLMClient:
         if tools:
             payload["tools"] = tools
         return payload
+
+    def _endpoints(self) -> list[tuple[str, str, str]]:
+        """调用链：主端点优先，其后是配置完整的降级端点（fallback_base_url+fallback_model）。"""
+        chain = [(self.config.base_url, self.config.api_key, self.config.model)]
+        if self.config.fallback_base_url and self.config.fallback_model:
+            chain.append((self.config.fallback_base_url, self.config.fallback_api_key, self.config.fallback_model))
+        return chain
+
+    @property
+    def fallback_configured(self) -> bool:
+        """是否配置了降级端点（供 /api/agent/health 与 UI 展示）。"""
+        return bool(self.config.fallback_base_url and self.config.fallback_model)
+
+    def _backoff_s(self, attempt: int) -> float:
+        """第 attempt 次重试（0 起）前的退避秒数：指数增长，封顶 retry_max_delay_s。"""
+        return min(self.config.retry_base_delay_s * (2**attempt), self.config.retry_max_delay_s)
 
     @staticmethod
     def _parse_sse_line(line: str) -> dict[str, Any] | None:
@@ -193,13 +312,18 @@ class LLMClient:
                 if fn.get("arguments"):
                     slot["function"]["arguments"] += str(fn["arguments"])
 
-    async def health_check(self) -> bool:
-        """GET {base_url}/models 探测;任何异常返回 False(不抛出)。"""
+    async def health_check(self, base_url: str | None = None, api_key: str | None = None) -> bool:
+        """GET {base_url}/models 探测;任何异常返回 False(不抛出)。
+
+        缺省探测主端点；传入降级端点参数可探测降级链（/api/agent/health 用）。
+        """
+        target = base_url or self.config.base_url
+        key = api_key if api_key is not None else self.config.api_key
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 resp = await client.get(
-                    f"{self.config.base_url.rstrip('/')}/models",
-                    headers=self._headers(),
+                    f"{target.rstrip('/')}/models",
+                    headers=self._headers(key),
                 )
             return resp.status_code == 200
         except httpx.HTTPError:

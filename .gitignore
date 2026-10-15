@@ -61,7 +61,10 @@ logs/
 backups/
 
 # 本地独享文档（治理/分析报告，仅本地保留、不上远程，2026-09-02）
-docs/
+docs/*
+# 运维 runbook 必须随仓库分发（alerts.py 的告警 runbook 链接指向本目录，
+# v2.9 评估运维稳定性 P1-1：原先整目录被忽略导致克隆即失）
+!docs/runbooks/
 
 # ── Model Files (大文件不提交) ──────────────────────────────
 *.safetensors

@@ -26,15 +26,54 @@ import asyncio
 import json
 import logging
 import os
+import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Any
 
 import httpx
 
+from ..observability.metrics import get_metrics
+from .llm_metrics import llm_usage
+
 logger = logging.getLogger(__name__)
 
 _SSE_DATA_PREFIX = "data:"
+
+
+def _record_usage(
+    *,
+    outcome: str,
+    latency_s: float,
+    result: dict[str, Any] | None = None,
+    first_token_s: float | None = None,
+    model: str = "",
+) -> None:
+    """记录一次 LLM 调用到日聚合与 Prometheus 注册表（观测异常不外抛）。"""
+    try:
+        usage = (result or {}).get("usage") or {}
+        prompt_tokens = int(usage.get("prompt_tokens") or 0)
+        completion_tokens = int(usage.get("completion_tokens") or 0)
+        llm_usage.record(
+            outcome=outcome,
+            latency_s=latency_s,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            first_token_s=first_token_s,
+            model=model,
+        )
+        m = get_metrics()
+        m.llm_calls_total.inc(1.0, outcome=outcome)
+        if prompt_tokens:
+            m.llm_prompt_tokens_total.inc(float(prompt_tokens))
+        if completion_tokens:
+            m.llm_completion_tokens_total.inc(float(completion_tokens))
+        if outcome == "ok":
+            m.llm_last_latency_seconds.set(max(0.0, float(latency_s)))
+            if first_token_s is not None:
+                m.llm_first_token_last_seconds.set(max(0.0, float(first_token_s)))
+    except Exception:  # noqa: BLE001 - 观测永不阻断业务
+        logger.debug("llm usage record failed", exc_info=True)
 
 
 class LLMError(RuntimeError):
@@ -97,10 +136,13 @@ class LLMClient:
         """
         last_err: Exception | None = None
         endpoints = self._endpoints()
+        t0 = time.perf_counter()
         for ep_index, (base_url, api_key, model) in enumerate(endpoints):
             for attempt in range(self.config.max_retries + 1):
                 try:
-                    return await self._chat_completion_once(messages, tools, base_url, api_key, model)
+                    result = await self._chat_completion_once(messages, tools, base_url, api_key, model)
+                    _record_usage(outcome="ok", latency_s=time.perf_counter() - t0, result=result, model=model)
+                    return result
                 except LLMError as exc:
                     last_err = exc
                     if attempt < self.config.max_retries:
@@ -116,6 +158,7 @@ class LLMClient:
                         await asyncio.sleep(delay)
                     else:
                         logger.warning("LLM 端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
+        _record_usage(outcome="error", latency_s=time.perf_counter() - t0, model=self.config.model)
         raise LLMError(f"LLM 全部端点不可用（{len(endpoints)} 个）: {last_err}")
 
     async def _chat_completion_once(
@@ -158,14 +201,28 @@ class LLMClient:
         """
         last_err: Exception | None = None
         endpoints = self._endpoints()
+        t0 = time.perf_counter()
+        first_token_s: float | None = None
+        done_message: dict[str, Any] | None = None
         for ep_index, (base_url, api_key, model) in enumerate(endpoints):
             for attempt in range(self.config.max_retries + 1):
                 emitted = False
                 try:
                     async for event in self._stream_once(messages, tools, base_url, api_key, model):
                         if event.get("type") == "delta":
+                            if first_token_s is None:
+                                first_token_s = time.perf_counter() - t0
                             emitted = True
+                        elif event.get("type") == "done":
+                            done_message = event.get("message") or {}
                         yield event
+                    _record_usage(
+                        outcome="ok",
+                        latency_s=time.perf_counter() - t0,
+                        result={"usage": (done_message or {}).get("usage")},
+                        first_token_s=first_token_s,
+                        model=model,
+                    )
                     return
                 except LLMError as exc:
                     last_err = exc
@@ -185,6 +242,12 @@ class LLMClient:
                         await asyncio.sleep(delay)
                     else:
                         logger.warning("LLM 流式端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
+        _record_usage(
+            outcome="error",
+            latency_s=time.perf_counter() - t0,
+            first_token_s=first_token_s,
+            model=self.config.model,
+        )
         raise LLMError(f"LLM 全部端点不可用（{len(endpoints)} 个）: {last_err}")
 
     async def _stream_once(
@@ -200,6 +263,7 @@ class LLMClient:
         payload["stream"] = True
         content_parts: list[str] = []
         tool_calls: dict[int, dict[str, Any]] = {}
+        usage: dict[str, Any] | None = None
 
         try:
             async with httpx.AsyncClient(timeout=self.config.timeout_s) as client:
@@ -216,6 +280,8 @@ class LLMClient:
                         chunk = self._parse_sse_line(line)
                         if chunk is None:
                             continue
+                        if isinstance(chunk.get("usage"), dict):
+                            usage = chunk["usage"]
                         for choice in chunk.get("choices") or []:
                             delta = choice.get("delta") or {}
                             text = delta.get("content")
@@ -229,6 +295,8 @@ class LLMClient:
         message: dict[str, Any] = {"content": "".join(content_parts)}
         if tool_calls:
             message["tool_calls"] = [tool_calls[i] for i in sorted(tool_calls)]
+        if usage:
+            message["usage"] = usage
         yield {"type": "done", "message": message}
 
     # ── 内部工具 ────────────────────────────────────────────

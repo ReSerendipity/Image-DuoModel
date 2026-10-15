@@ -17,6 +17,7 @@ from typing import Any
 
 from fastapi import APIRouter, Request, Response
 
+from ..agent.llm_client import llm_usage
 from ..config import get_config
 from ..cost_governance import get_metrics_store
 from ..gpu_utils import get_gpu_info
@@ -140,12 +141,23 @@ def _build_alert_snapshot(request: Request) -> dict[str, Any]:
     d = _disk_info()
     disk_free_pct = (d["free"] / d["total"] * 100.0) if d["total"] else None
 
+    # LLM Token 日预算（v2.9 评估·LLM 应用工程 P1-2：budget=0 表示不启用）
+    llm_tokens_today = 0.0
+    try:
+        llm_tokens_today = float(llm_usage.snapshot().get("tokens_today", 0) or 0)
+    except Exception:  # noqa: BLE001
+        llm_tokens_today = 0.0
+    llm_token_budget = float(getattr(getattr(cfg, "finops", None), "budget_llm_tokens_per_day", 0) or 0)
+
     return {
         "queue_fill_ratio": fill_ratio,
         "generation_failure_rate": failure_rate,
         "gpu_free_pct": gpu_free_pct,
         "disk_free_pct": disk_free_pct,
         "health_unhealthy": health_unhealthy(),
+        "llm_tokens_today": llm_tokens_today,
+        "llm_token_budget": llm_token_budget,
+        "llm_token_budget_exceeded": bool(llm_token_budget > 0 and llm_tokens_today > llm_token_budget),
         "now": time.time(),
     }
 
@@ -170,6 +182,9 @@ async def alerts(request: Request) -> dict[str, Any]:
             "gpu_free_pct": round(snapshot["gpu_free_pct"], 2) if snapshot["gpu_free_pct"] is not None else None,
             "disk_free_pct": round(snapshot["disk_free_pct"], 2) if snapshot["disk_free_pct"] is not None else None,
             "health_unhealthy": snapshot["health_unhealthy"],
+            "llm_tokens_today": snapshot.get("llm_tokens_today", 0.0),
+            "llm_token_budget": snapshot.get("llm_token_budget", 0.0),
+            "llm_token_budget_exceeded": snapshot.get("llm_token_budget_exceeded", False),
         },
         "alerts": [a.to_dict() for a in active],
         "firing_count": sum(1 for a in active if a.firing),

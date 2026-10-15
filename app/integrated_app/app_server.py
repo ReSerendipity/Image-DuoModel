@@ -26,6 +26,7 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from .agent.llm_client import llm_usage
 from .checkpoint import TaskCheckpoint
 from .config import get_config
 from .cost_governance import (
@@ -413,6 +414,13 @@ async def lifespan(app: FastAPI):
                 disk_free_pct = du.free / du.total * 100.0
             except Exception:
                 disk_free_pct = None
+            # LLM Token 日预算（v2.9 评估·LLM 应用工程 P1-2）：budget=0 表示不启用
+            llm_tokens_today = 0.0
+            try:
+                llm_tokens_today = float(llm_usage.snapshot().get("tokens_today", 0) or 0)
+            except Exception:  # noqa: BLE001
+                llm_tokens_today = 0.0
+            llm_token_budget = float(getattr(getattr(cfg, "finops", None), "budget_llm_tokens_per_day", 0) or 0)
             get_alert_engine().evaluate(
                 {
                     "queue_fill_ratio": fill,
@@ -420,6 +428,9 @@ async def lifespan(app: FastAPI):
                     "gpu_free_pct": gpu_free_pct,
                     "disk_free_pct": disk_free_pct,
                     "health_unhealthy": health_unhealthy(),
+                    "llm_tokens_today": llm_tokens_today,
+                    "llm_token_budget": llm_token_budget,
+                    "llm_token_budget_exceeded": bool(llm_token_budget > 0 and llm_tokens_today > llm_token_budget),
                     "now": time.time(),
                 }
             )

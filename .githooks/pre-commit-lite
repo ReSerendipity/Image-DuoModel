@@ -54,10 +54,12 @@ if [ -z "$PY" ]; then
     done
 fi
 if [ -z "$PY" ]; then
-    echo "  [WARN] 未找到 Python，structure-guard 未执行 —— 根目录本次未校验！" >&2
-    echo "         安装 Python 或重建 .venv 后自动生效。" >&2
-    if [ "$GUARD_STRICT" = "1" ]; then
-        echo "  [FAIL] GUARD_STRICT=1，守卫缺席视为失败。" >&2
+    if [ "$GUARD_ALLOW_NO_PYTHON" = "1" ]; then
+        echo "  [WARN] 未找到 Python，structure-guard 未执行（GUARD_ALLOW_NO_PYTHON=1 显式放行）—— 根目录本次未校验！" >&2
+    else
+        echo "  [FAIL] 未找到 Python，structure-guard 无法执行 —— 默认拒绝提交。" >&2
+        echo "         旧行为是打印 [WARN] 后放行，等于守卫缺席仍算通过；已改为默认严格。" >&2
+        echo "         安装 Python 或重建 .venv 后自动生效；确需无 Python 提交：GUARD_ALLOW_NO_PYTHON=1 git commit ..." >&2
         FAILED=1
     fi
 else

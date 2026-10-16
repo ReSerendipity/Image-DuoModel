@@ -230,6 +230,9 @@ python scripts/verify_watermark.py outputs/z_image_turbo_native/20260814/xxx_ori
 ## 开发与测试
 
 ```bash
+# 启用仓库钩子（必做一次：core.hooksPath 是本地配置，不会随克隆传播）
+git config core.hooksPath .githooks        # 或运行 ./.githooks/install.sh
+
 # 运行测试
 python -m pytest -q
 
@@ -238,6 +241,9 @@ python -m ruff check app tests
 
 # 覆盖率
 python -m pytest --cov=app/integrated_app --cov-report=term-missing
+
+# 文档路径引用完整性（AGENTS.md / README / 可分发 agent 基线；也已在 pre-commit 内自动执行）
+python scripts/check_spec_refs.py --self
 
 # E2E 测试（需先安装 Playwright）
 pip install playwright pytest-playwright

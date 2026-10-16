@@ -1,7 +1,7 @@
 {
   "_comment": "分支保护单一来源。改这里 → 跑 python docs/ci/apply_branch_protection.py --apply。contexts 须与 .github/workflows/ci.yml 的 job name 逐字一致；e2e/performance 两个 job 因波动暂不作必需检查，其余 ci.yml job 全部阻断。",
   "owner": "ReSerendipity",
-  "repo": "Image-MultiModel",
+  "repo": "Image-duoModel",
   "branch": "main",
   "policy": {
     "required_approving_review_count": 1,
@@ -39,6 +39,7 @@
     "DCO Check"
   ],
   "required_conversation_resolution": false,
-  "_measured_at": "2026-09-28T10:25Z 首测；2026-10-07 复核校正：① repo 字段旧名 Image_MultiModel → Image-MultiModel（仓库已改名，GET 会跟随 307 重定向所以漂移检测一直“看起来正常”，但 PUT 不跟随，导致 --apply 实际写不进去）；② policy.required_approving_review_count 0 → 1，与本文件 _meets_reality/bypass_note 及 live 实测一致（GitHub 该字段最小值即为 1）；③ contexts 补 Lock Solvability (pip resolver dry-run) 与 DCO Check 两条——它们已在 live 与 ci.yml/dco.yml 的 job name 中真实存在，按本文件 _comment「contexts 须与 job name 逐字一致」补全，避免 --apply 把他人新增的必需检查静默摘掉。",
-  "_meets_reality": "live 已改为：require PR(1 approval) + enforce_admins=false；owner/admin 直推 main 免 PR，其余账号强制 PR。"
+  "_measured_at": "2026-09-28T10:25Z 首测；2026-10-07 复核校正：① repo 字段旧名 Image_MultiModel → Image-MultiModel（仓库已改名，GET 会跟随 307 重定向所以漂移检测一直“看起来正常”，但 PUT 不跟随，导致 --apply 实际写不进去）；② policy.required_approving_review_count 0 → 1，与本文件 _meets_reality/bypass_note 及 live 实测一致（GitHub 该字段最小值即为 1）；③ contexts 补 Lock Solvability (pip resolver dry-run) 与 DCO Check 两条——它们已在 live 与 ci.yml/dco.yml 的 job name 中真实存在，按本文件 _comment「contexts 须与 job name 逐字一致」补全，避免 --apply 把他人新增的必需检查静默摘掉。2026-10-17 再校正：仓库二次改名为 Image-duoModel（gh api repos/ReSerendipity/Image-MultiModel --jq .full_name 实测），repo 字段同步更新；同一机制再次生效——只读检测走 GET 会跟随重定向所以照旧“看起来正常”，名字漂移只有真正 --apply（PUT）才会暴露，故此处必须跟着改名。",
+  "_meets_reality": "live 已改为：require PR(1 approval) + enforce_admins=false；owner/admin 直推 main 免 PR，其余账号强制 PR。",
+  "_pending_approval": "本次修复只改本文件（改名同步），未执行 --apply、未做任何 gh 写操作。另有两项待拍板：① contexts 里的「Test + Coverage (Python 3.13)」在 PR 事件下按 ci.yml:184 设计永不产出（实测 PR 因此停在 BLOCKED），要么从 required 移除、要么让它在 PR 上跑；② ci.yml:172 注释断言「3.13 不在 required 列表」，与 live 与本文件均相反。"
 }

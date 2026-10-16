@@ -101,7 +101,8 @@ pytest_out*.txt
 gen*.txt
 fp_out*.txt
 
-# CI 修复交接日志（本地账本，不入库）
+# CI 修复交接日志（旧本地账本，不入库）：内容已迁到随仓库分发的
+# docs/runbooks/ci_fix_ledger.md。保留忽略是为了不再产生第二份事实来源——勿再往这里登记。
 FIX_LOG.md
 
 # ── Checkpoints ─────────────────────────────────────────────

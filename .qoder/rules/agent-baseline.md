@@ -42,6 +42,8 @@ paths:
 - 禁止静默直写远程；不得改动他人未提交的工作区内容。
 - push ≠ 完成：`gh run list` / `gh run watch` 盯到 CI 终态，红了当场修；lint/type 真失败时修代码，
   不用 `--no-verify` 绕过钩子。
+- 动手修 CI 红灯前先读交接台账 `docs/runbooks/ci_fix_ledger.md`（随仓库分发）：**同一失败签名
+  第二次出现禁止再朝同方向重试**，必须读完整失败日志或 `git revert` 换策略。
 - 修复 Bug / 踩坑后须把坑点追加到 `docs/agents/GOTCHAS.md`（该文件随仓库分发）。
 
 ## 5. 🧹 构建产物滚动清理

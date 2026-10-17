@@ -9,9 +9,9 @@ torchvision>=0.29.0
 torchaudio>=2.4.0
 
 # ── Web 框架 ──────────────────────────────────────────────
-fastapi>=0.100.0
-uvicorn[standard]>=0.53.0
-starlette>=1.6.0
+fastapi>=0.143.0
+uvicorn[standard]>=0.54.0
+starlette>=1.7.0
 python-multipart>=0.0.6
 jinja2>=3.1.0
 
@@ -64,13 +64,13 @@ pytest-asyncio>=0.21.0
 pytest-cov>=4.1.0
 pytest-timeout>=2.0.0
 pytest-xdist>=3.0.0
-hypothesis>=6.168.0
+hypothesis>=6.169.1
 factory-boy>=3.3.0
 beautifulsoup4>=4.12.0
 
 # ── 可选：Playwright E2E（M5 阶段）────────────────────────
-playwright>=1.63.0
-pytest-playwright>=0.4.0
+playwright>=1.64.0
+pytest-playwright>=0.10.0
 
 # ── 原生引擎复用 Comfy 源码所需依赖（backend: native）──────
 # 复用 references/ComfyUI/comfy/ + aki-v3 custom_nodes 源码时按 import 补齐

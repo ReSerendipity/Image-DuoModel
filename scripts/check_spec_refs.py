@@ -9,7 +9,8 @@ docs-consistency.yml / structure-guard.yml 永远绿，实际从未校验任何�
 现在拆成两层：
 
 1. 仓内自检（self-check，始终执行，不依赖任何仓外组件）
-   仅校验 AGENTS.md / README.md 中以反引号 inline code 或 markdown 相对链接出现的
+   仅校验 AGENTS.md / README.md / .qoder/rules/agent-baseline.md（可分发 agent 基线层）
+   中以反引号 inline code 或 markdown 相对链接出现的
    **仓内相对路径引用**是否真实存在。产出真实的 clean / gap 结论。
      - 本地（默认，未设 CI）＝严格模式：缺失即 gap。
      - CI（环境变量 CI 为真值）＝宽松模式：对落在被 .gitignore 排除、且干净 checkout
@@ -44,7 +45,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve()
 REPO_ROOT = HERE.parents[1]
-DEFAULT_DOCS = ("AGENTS.md", "README.md")
+DEFAULT_DOCS = ("AGENTS.md", "README.md", ".qoder/rules/agent-baseline.md")
 
 # ── 抽取：inline code（单/双反引号）+ markdown 相对链接目标 ──────────────
 _CODE_SPAN_RE = re.compile(r"(?<!`)`{1,2}(?!`)(.+?)(?<!`)`{1,2}(?!`)")
@@ -232,6 +233,7 @@ def run_self_check(
 
     hits: dict[str, int] = {}  # rel -> 命中数（真实存在的引用）
     misses: dict[str, list[tuple[str, int, str]]] = {}  # rel -> [(doc, line, token)]
+    absent_docs: list[str] = []  # 声明文档里缺失的那些（稍后按是否被忽略分流）
     skipped = 0
     root_missing_cache: dict[str, bool] = {}
 
@@ -242,11 +244,12 @@ def run_self_check(
         return root_missing_cache[comp]
 
     for doc in docs:
+        rel_top = doc.relative_to(root).as_posix() if doc.is_relative_to(root) else doc.name
         if not doc.exists():
-            # 文档本身缺失（如 CI 未 checkout 本地保留的 AGENTS.md）：记为 skip，不因此判失败。
-            skipped += 1
-            if verbose:
-                print(f"  SKIP   (doc absent) {doc.name}")
+            # 文档本身缺失先收集，最后按「是否被 gitignore」分流：
+            #   被忽略（如 CI 未 checkout 本地保留的 AGENTS.md）→ skip，属干净检出的正常态；
+            #   未被忽略 → 判 gap。否则门禁会悄悄只读了声明文档集的一半还报 PASS。
+            absent_docs.append(rel_top)
             continue
         text = doc.read_text(encoding="utf-8", errors="replace")
         lines = text.splitlines()
@@ -286,6 +289,17 @@ def run_self_check(
         for rel in sorted(misses)
         for doc_name, lineno, norm in misses[rel]
     ]
+
+    # 缺失的声明文档分流：被 gitignore 的本地保留载体记 skip，其余判 gap。
+    if absent_docs:
+        ignored_docs = _paths_ignored(root, absent_docs)
+        for rel in sorted(absent_docs):
+            if rel in ignored_docs:
+                skipped += 1
+                if verbose:
+                    print(f"  SKIP   (doc absent, gitignored) {rel}")
+            else:
+                gap_lines.append(f"  GAP    {rel}  (声明的文档缺失，且未被 gitignore)")
 
     if verbose:
         for rel in sorted(hits):
@@ -364,6 +378,15 @@ def main(argv: list[str]) -> int:
     lenient = (strict is False) if strict is not None else _is_ci_env()
     mode = "lenient(CI)" if lenient else "strict(local)"
     print(f"[self-check] repo-internal reference integrity (mode={mode})")
+    # 先把「实际读到几份声明文档」打印出来：PASS 不再可能意味着悄悄只查了一半文档集。
+    declared = docs if docs is not None else [REPO_ROOT / name for name in DEFAULT_DOCS]
+    declared_rel = [d.relative_to(REPO_ROOT).as_posix() if d.is_relative_to(REPO_ROOT) else d.name for d in declared]
+    missing_rel = [rel for rel, d in zip(declared_rel, declared, strict=False) if not d.exists()]
+    ignored_missing = _paths_ignored(REPO_ROOT, missing_rel) if missing_rel else set()
+    note = ", ".join(f"{rel}[{'gitignored' if rel in ignored_missing else 'ABSENT'}]" for rel in missing_rel) or "none"
+    print(
+        f"[self-check] docs={len(declared) - len(missing_rel)}/{len(declared)} read (declared={len(declared)}, missing: {note})"
+    )
     checked, skipped, gaps, gap_lines = run_self_check(REPO_ROOT, docs, strict=strict, verbose=verbose)
     for line in gap_lines:
         print(line)

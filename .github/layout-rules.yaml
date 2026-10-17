@@ -45,7 +45,6 @@ gitignored_expect:
   - .torch_cache
   - .trae
   - .idea
-  - .qoder
   - htmlcov
   - .gradle
   - .kotlin
@@ -65,6 +64,9 @@ root_allowlist:
   - .gitignore
   - .mailmap
   - .pre-commit-config.yaml
+  # .qoder 现含随仓库分发的 agent 基线（.qoder/rules/），不再是整体忽略项，
+  # 故从 gitignored_expect 移到这里；否则结构门禁会对同一目录给两条假信号。
+  - .qoder
   - CHANGELOG.md
   - Dockerfile
   - LICENSE

@@ -3,6 +3,7 @@
 #   1) 仓库有 .pre-commit-config.yaml 且 pre-commit 框架可用 -> 交给框架
 #   2) 否则 -> 交给同目录的 pre-commit-lite（大文件/密钥/冲突标记 + 根目录守卫）
 # 0) 路径可移植性检查：阻止本机绝对路径入库（规则见 docs/CODING_STANDARDS.md 第 1 节）
+# 0b) 指令层路径引用完整性（scripts/check_spec_refs.py --self，严格模式）
 if [ -f scripts/check_no_hardcoded_paths.py ]; then
     PY_BIN=""
     for c in python python3; do
@@ -13,6 +14,26 @@ if [ -f scripts/check_no_hardcoded_paths.py ]; then
             echo "[pre-commit] 检测到本机绝对路径（C:\Users\... 等），提交已拒绝。绕过：git commit --no-verify" >&2
             exit 1
         fi
+    fi
+fi
+# 0b) 指令层路径引用完整性（严格模式）：AGENTS.md / README / 可分发基线里的仓内路径引用失效即拒提交
+#     校验器缺席默认阻断；确需放行须显式设 GUARD_ALLOW_NO_PYTHON=1（该选择会打印出来，便于审计）。
+if [ -f scripts/check_spec_refs.py ]; then
+    PY_SR=""
+    for c in python python3; do
+        command -v "$c" >/dev/null 2>&1 && PY_SR="$c" && break
+    done
+    if [ -n "$PY_SR" ]; then
+        if ! "$PY_SR" scripts/check_spec_refs.py --self; then
+            echo "[pre-commit] 文档路径引用完整性未通过（见上方 GAP 行），提交已拒绝。紧急绕过：git commit --no-verify" >&2
+            exit 1
+        fi
+    elif [ "$GUARD_ALLOW_NO_PYTHON" = "1" ]; then
+        echo "  [WARN] 未找到 Python，文档引用完整性本次未校验（GUARD_ALLOW_NO_PYTHON=1 显式放行）。" >&2
+    else
+        echo "  [FAIL] 未找到 Python，无法执行文档引用完整性校验 —— 默认拒绝提交。" >&2
+        echo "         装好 Python 后自动生效；确需无 Python 提交：GUARD_ALLOW_NO_PYTHON=1 git commit ..." >&2
+        exit 1
     fi
 fi
 if [ -f .pre-commit-config.yaml ]; then
@@ -34,13 +55,20 @@ if [ -f .pre-commit-config.yaml ]; then
         exit 0
     fi
     # 回退：pre-commit 控制台命令（uv tool / pipx / PATH 安装，无 venv 时保证框架仍生效）
+    # 先探活再交给它：控制台包装器绑定的解释器可能已被删除（uv/pipx 迁移、沙箱清理）。
+    # 那种非零退出不是「检查未通过」，把它算成失败只会逼人用 --no-verify 绕过钩子。
     if command -v pre-commit >/dev/null 2>&1; then
-        echo "[pre-commit] 使用 pre-commit 框架（控制台命令）"
-        if ! pre-commit run --config .pre-commit-config.yaml; then
-            echo "[pre-commit] 框架检查未通过。紧急绕过：git commit --no-verify" >&2
-            exit 1
+        if pre-commit --version >/dev/null 2>&1; then
+            echo "[pre-commit] 使用 pre-commit 框架（控制台命令）"
+            if ! pre-commit run --config .pre-commit-config.yaml; then
+                echo "[pre-commit] 框架检查未通过。紧急绕过：git commit --no-verify" >&2
+                exit 1
+            fi
+            exit 0
         fi
-        exit 0
+        echo "  [WARN] 控制台 pre-commit 无法启动（其绑定的解释器已失效），框架层本次未执行" >&2
+        echo "         已回退轻量门禁；框架钩子本次未跑，不等于「已通过」。" >&2
+        echo "         修复：python -m pip install pre-commit，或重建该包装器所属的 uv/pipx 工具环境。" >&2
     fi
 fi
 exec "$(dirname "$0")/pre-commit-lite"

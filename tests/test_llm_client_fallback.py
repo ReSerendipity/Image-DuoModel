@@ -89,7 +89,7 @@ async def test_retry_backoff_then_success(monkeypatch: pytest.MonkeyPatch) -> No
     async def fake_sleep(delay: float) -> None:
         sleeps.append(delay)
 
-    monkeypatch.setattr(llm_mod.asyncio, "sleep", fake_sleep)
+    monkeypatch.setattr(llm_mod, "_sleep", fake_sleep)
 
     def handler(request: httpx.Request) -> httpx.Response:
         state["n"] += 1
@@ -141,3 +141,27 @@ def test_endpoints_order_and_fallback_flag() -> None:
     assert client.fallback_configured is True
     assert client._endpoints()[0][0] == PRIMARY
     assert client._endpoints()[1][0] == FALLBACK
+
+
+async def test_backoff_sleep_seam_does_not_hijack_stdlib(monkeypatch: pytest.MonkeyPatch) -> None:
+    """回归锁：退避打点只能记自己的 sleep，不能劫持进程内的 asyncio.sleep。
+
+    旧写法 `monkeypatch.setattr(llm_mod.asyncio, "sleep", fake)` 换掉的是**标准库模块属性**，
+    补丁存续期内进程里任何 `await asyncio.sleep()`（如 app/integrated_app/testing/fake_engine.py
+    的 0.001s 轮询）都会写进同一个列表——单进程全量跑时 `assert sleeps == [0.5]` 因此间歇性变红
+    （实测：单跑 3/3 通过、整文件 7/7 通过、全量 -q 挂；-n auto 下不复现）。
+    """
+    import asyncio as _a
+
+    seen: list[float] = []
+
+    async def spy(delay: float) -> None:
+        seen.append(delay)
+
+    real_sleep = _a.sleep
+    monkeypatch.setattr(llm_mod, "_sleep", spy)
+
+    await _a.sleep(0.001)  # 其它组件的正常用法，不该被本测试的记录点捕获
+
+    assert _a.sleep is real_sleep, "asyncio.sleep 被整体替换 = 污染整个进程"
+    assert seen == [], f"外来 sleep 被记进来了：{seen}"

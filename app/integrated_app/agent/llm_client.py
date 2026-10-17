@@ -40,6 +40,11 @@ logger = logging.getLogger(__name__)
 
 _SSE_DATA_PREFIX = "data:"
 
+# 指数退避的等待接缝：测试通过替换本名字来记录退避，而不是替换 asyncio.sleep。
+# 直接 monkeypatch asyncio.sleep 会污染整个进程（其它组件的 await 也一并被记走），
+# 单进程全量跑时会让退避断言间歇性变红。
+_sleep = asyncio.sleep
+
 
 def _record_usage(
     *,
@@ -155,7 +160,7 @@ class LLMClient:
                             delay,
                             exc,
                         )
-                        await asyncio.sleep(delay)
+                        await _sleep(delay)
                     else:
                         logger.warning("LLM 端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
         _record_usage(outcome="error", latency_s=time.perf_counter() - t0, model=self.config.model)
@@ -239,7 +244,7 @@ class LLMClient:
                             delay,
                             exc,
                         )
-                        await asyncio.sleep(delay)
+                        await _sleep(delay)
                     else:
                         logger.warning("LLM 流式端点 %d/%s 重试上限已达: %s", ep_index + 1, base_url, exc)
         _record_usage(

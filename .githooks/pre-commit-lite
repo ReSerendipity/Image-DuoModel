@@ -72,6 +72,26 @@ else
     fi
 fi
 
+# 5) ruff lint（四级回退走到 lite 档时补上 lint 空洞；与 ruff-pre-commit 同口径，不做 --fix）
+PYFILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.pyi?$' || true)
+if [ -n "$PYFILES" ] && [ -n "$PY" ]; then
+    if $PY -m ruff --version >/dev/null 2>&1; then
+        echo "[pre-commit-lite] ruff check 暂存 Python 文件（不自动改写）"
+        # shellcheck disable=SC2086
+        if ! $PY -m ruff check $PYFILES; then
+            echo "" >&2
+            echo "  [FAIL] ruff 未通过 —— 按活动契约应修代码，而不是 git commit --no-verify。" >&2
+            FAILED=1
+        fi
+    elif [ "$GUARD_ALLOW_NO_PYTHON" = "1" ]; then
+        echo "  [WARN] ruff 不可用，lint 本次未执行（GUARD_ALLOW_NO_PYTHON=1 显式放行）—— 暂存 .py 未被检查！" >&2
+    else
+        echo "  [FAIL] 暂存了 Python 文件但 ruff 不可用，lint 无法执行 —— 默认拒绝提交。" >&2
+        echo "         装 ruff（python -m pip install ruff）后自动生效；确需放行：GUARD_ALLOW_NO_PYTHON=1 git commit ..." >&2
+        FAILED=1
+    fi
+fi
+
 if [ "$FAILED" -ne 0 ]; then
     echo "[pre-commit] 未通过。紧急绕过：git commit --no-verify" >&2
     exit 1

@@ -15,11 +15,11 @@ git config core.hooksPath .githooks      # 或执行 ./.githooks/install.sh
 | `prepare-commit-msg` | 自动追加 `Signed-off-by`（幂等，插在注释块之前） |
 | `commit-msg` | DCO 硬校验（缺签名阻断）+ conventional 规范软提示 |
 | `post-merge` / `post-checkout` | 依赖清单变更提醒（pip / pnpm / npm / cargo / gradle） |
-| `pre-commit-lite` | 轻量检查：大文件、私钥与令牌、冲突标记 + 根目录守卫 |
+| `pre-commit-lite` | 轻量检查：大文件、私钥与令牌、冲突标记 + 根目录守卫 + 暂存 Python 文件的 `ruff check`（与 ruff-pre-commit 同口径，不做 `--fix`；补齐四级回退在 lite 档的 lint 空洞） |
 
 ## 说明
 
-- 找不到 Python 时，分发器与 `pre-commit-lite` **默认阻断提交**（旧行为是 `[WARN]` 后放行，等于守卫缺席仍算通过）。确需在无 Python 环境提交时，显式设 `GUARD_ALLOW_NO_PYTHON=1`，输出里会留下该放行的痕迹。
+- 找不到 Python 时，分发器与 `pre-commit-lite` **默认阻断提交**（旧行为是 `[WARN]` 后放行，等于守卫缺席仍算通过）。暂存了 Python 文件而 `ruff` 不可用时同样默认阻断。确需放行时显式设 `GUARD_ALLOW_NO_PYTHON=1`，输出里会留下该放行的痕迹。
 - 控制台 `pre-commit` 会先探活（`pre-commit --version`）再交给它：包装器绑定的解释器被删除时，其非零退出**不再**被当作「框架检查未通过」，而是打印 `[WARN]` 后回退轻量门禁——框架钩子本次未跑，不等于已通过。
 - 大文件阈值默认 5MB，可用 `GUARD_MAX_FILE_MB` 调整。
 - `core.hooksPath` 是**本地**配置，不会随克隆传播——换机器请重新执行上面那行命令（README「开发与测试」段已把它列为必做第一步）。

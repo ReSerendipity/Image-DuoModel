@@ -14,7 +14,7 @@
 
 *浅色主题 — 生图工作台主页 / 高级参数 / 预设管理 / 历史记录 / 图片展示 / 批量模式*
 
-> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image-MultiModel/)。
+> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image-duoModel/)。
 
 ---
 

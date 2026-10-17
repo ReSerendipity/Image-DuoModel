@@ -61,7 +61,10 @@ logs/
 backups/
 
 # 本地独享文档（治理/分析报告，仅本地保留、不上远程，2026-09-02）
-docs/
+docs/*
+# 运维 runbook 必须随仓库分发（alerts.py 的告警 runbook 链接指向本目录，
+# v2.9 评估运维稳定性 P1-1：原先整目录被忽略导致克隆即失）
+!docs/runbooks/
 
 # ── Model Files (大文件不提交) ──────────────────────────────
 *.safetensors
@@ -98,7 +101,8 @@ pytest_out*.txt
 gen*.txt
 fp_out*.txt
 
-# CI 修复交接日志（本地账本，不入库）
+# CI 修复交接日志（旧本地账本，不入库）：内容已迁到随仓库分发的
+# docs/runbooks/ci_fix_ledger.md。保留忽略是为了不再产生第二份事实来源——勿再往这里登记。
 FIX_LOG.md
 
 # ── Checkpoints ─────────────────────────────────────────────
@@ -193,7 +197,10 @@ desktop/installer/ImageMultiModel-Setup-v*.exe
 学习报告任务备忘_20260912.md
 
 # AI IDE 本地工作目录（仅本地保留，不上远程）
-.qoder/
+# 例外（2026-10-06 设立，2026-10-16 恢复）：.qoder/rules/ 是随仓库分发的 agent 基线指令层——
+# 根 AGENTS.md 与 docs/agents/ 均为本地保留，干净克隆 / CI 检出里只有这份基线可读。
+.qoder/*
+!.qoder/rules/
 # 根目录健康文件由组织级仓库提供（self-purify 检查②），本地不入库
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md

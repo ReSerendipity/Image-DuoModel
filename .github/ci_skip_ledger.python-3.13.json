@@ -1,21 +1,21 @@
 {
-  "_comment": "CI skip 台账：Test + Coverage (Python 3.13) 的 junit skip 分布基线。语义是精确相等——条数变多=新增未登记 skip，变少=登记过的 skip 悄悄消失，两者都必须走红 PR 改台账，不许把门禁放宽成 warning。",
+  "_comment": "CI skip 台账：Test + Coverage (Python 3.13) 的 junit skip 分布基线。语义是精确相等——条数变多=新增未登记 skip，变少=登记过的 skip 悄悄消失，两者都必须走红 PR 改台账，不许把门禁放宽成 warning。 同步纪律：本台账与 ci_skip_ledger.python-3.12.json 描述同一份测试收集面，新增/移除 skip 必须同一笔改动里一起更新，只改一份会让另一份的精确相等闸恒红。",
   "source": {
-    "event": "push (main)",
-    "run_id": 37171686096,
+    "event": "schedule (main)",
+    "run_id": 38862263716,
     "artifact": "junit-python-3.13",
-    "head": "9278f8b",
-    "observed": "1462 用例 / 1234 执行出结论 / 228 skip / 0 失败",
-    "collected_utc": "2026-10-04",
-    "history": "v1.3.0 发版期重采：① conftest _comfy_available 增加 vendored comfy_kernel 源码检查 + 跳过范围扩展到 tests/native/ 整目录（原生栈 skip 150→206）；② 登记两条此前漏登记的原因（_INJECTION_PATTERNS 中文越狱缺口、symlink 不支持）；③ min_executed 850→1150（收集总数 1061→1462）"
+    "head": "e030930",
+    "observed": "1482 用例 / 1248 执行出结论 / 234 skip / 0 失败 0 错误",
+    "collected_utc": "2026-10-17",
+    "history": "v1.3.0 发版期重采：① conftest _comfy_available 增加 vendored comfy_kernel 源码检查 + 跳过范围扩展到 tests/native/ 整目录（原生栈 skip 150→206）；② 登记两条此前漏登记的原因（_INJECTION_PATTERNS 中文越狱缺口、symlink 不支持）；③ min_executed 850→1150（收集总数 1061→1462）。 2026-10-17 再采（OPEN-1）：3.12 台账随 PR(feat/db-rating-column) 刷到 234/11 类时，本 3.13 台账未同步，停在 228/10 类，使 CI 精确相等闸在 main 上恒红；本次按权威产物把分布对齐（原生栈 206→209、新增「无 CUDA GPU（本机）」3 条 = tests/native/test_gpu_smoke.py 的 3 项），min_executed 维持 1150 不上调（产物实执行 1248，余量保留，避免把收集数波动变成新的红源）。两份台账必须同笔移动，见 _comment。"
   },
-  "total_skips_expected": 228,
+  "total_skips_expected": 234,
   "min_executed": 1150,
   "reasons": [
     {
       "key": "原生引擎栈不可用",
-      "count": 206,
-      "note": "tests/native/ 整目录（引擎测试 + 各引擎 weight-point-at-real-files + vlm comfy 路径）在 CI 上因缺 vendored comfy_kernel/真权重整体跳过（v1.3.0 起 _ENGINE_OK 含 vendored 源码检查，跳过范围覆盖 tests/native/）"
+      "count": 209,
+      "note": "tests/native/ 整目录（引擎测试 + 各引擎 weight-point-at-real-files + vlm comfy 路径）在 CI 上因缺 vendored comfy_kernel/真权重整体跳过（v1.3.0 起 _ENGINE_OK 含 vendored 源码检查，跳过范围覆盖 tests/native/）；v1.3.1 起 +3（test_gpu_smoke.py 的 CPU 侧用例并入 native 目录范围）"
     },
     {
       "key": "ComfyUI 不在线",
@@ -61,6 +61,11 @@
       "key": "data/cache",
       "count": 1,
       "note": "缩略图缓存目录无可用 PNG（需真实产物）。"
+    },
+    {
+      "key": "无 CUDA GPU，跳过",
+      "count": 3,
+      "note": "tests/native/test_gpu_smoke.py 的 @requires_cuda 用例（torch/CUDA sanity、GPU matmul、vram 真读）在 CI 无 GPU 上跳过；本机 RTX 5070 Ti 已真跑 6/6（GPU 补验报告）"
     }
   ],
   "python_version": "3.13"

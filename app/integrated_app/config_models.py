@@ -542,6 +542,9 @@ class FinOpsConfig(BaseModel):
 
     budget_gpu_hours_per_day: float = 0.0  # 单 GPU 日均 GPU·小时预算
     storage_gb_budget: float = 0.0  # 输出目录体积预算（GB）
+    # Agent LLM 日 Token 预算（v2.9 评估·LLM 应用工程 P1-2；0 = 不启用）。
+    # 超预算由 AlertEngine 规则 LLMTokenBudgetExceeded 产生 warning 告警。
+    budget_llm_tokens_per_day: float = 0.0
     alert_level: str = "warning"  # warning | error
 
 

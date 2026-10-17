@@ -169,10 +169,17 @@ jobs:
 
   test-313:
     name: Test + Coverage (Python 3.13)
-    # 3.13 不在 required 列表（gh api branches/main/protection/required_status_checks
-    # 复核过：四个 required context 里只有 3.12 那一个），所以从 PR 摘掉不会造成
-    # "expected but never run"。改为只在「非 PR 事件」跑：每日 UTC 02:00 schedule
-    # 一次 + 每次合入 main 一次，兼容性覆盖没丢，只是不再占用 PR runner。
+    # ⚠️ 本 job 的 name「Test + Coverage (Python 3.13)」曾实测**在** live 的必需检查里：
+    # gh api repos/<现名 Image-duoModel>/branches/main/protection
+    # --jq .required_status_checks.contexts → 2026-10-17 实测 15 条，含本 name；
+    # docs/ci/branch-protection.json 的 contexts 也曾声明它。于是下面「PR 事件不跑」在 PR 上
+    # 就是 expected-but-never-run：实测 PR 122 该 context = SKIPPED、mergeStateStatus = BLOCKED，
+    # 只有 enforce_admins=false 的管理员豁免能把改动落进 main。
+    # 【2026-10-17 已处置】从 required contexts 摘掉本条（contexts 15→14，远端回读已确认），
+    # 承认它是「合入后 + 夜间」的兼容性覆盖；不选「让本 job 也在 PR 上跑」，因为本 job 当前在
+    # main 上是红的（见 docs/runbooks/ci_fix_ledger.md OPEN-1），那样改会让每个 PR 被一条真红的
+    # 必需检查卡死。要恢复为必需检查，前提是先修 OPEN-1。
+    # 现状设计：只在「非 PR 事件」跑——每日 UTC 02:00 schedule 一次 + 每次合入 main 一次。
     # 实测口径：这一份 = 2.8 job-min/PR，近 30 天 75 次 PR 运行 ≈ 3.5 job-小时/月。
     #
     # 刻意不写成「matrix + job 级 if」：jobs.<job_id>.if 的可用上下文只有
@@ -650,7 +657,10 @@ jobs:
         # integrated_app.app_server（FastAPI 入口），需要 fastapi 及其运行依赖；
         # 该 job 仅做发布元数据校验，无需 torch，故只装轻量 web/运行时依赖
         # （全量 requirements.txt 含 torch，会超出本 job 10 分钟超时）。
-        run: pip install pytest pytest-timeout pyyaml fastapi pydantic jinja2 numpy prometheus-client python-multipart pillow
+        # httpx：tests/conftest 的 autouse fixture 经 integrated_app.app_server 间接 import
+        # agent.llm_client，其模块级 import httpx（v2.9 LLM 落地点）；缺它本 job 的用例
+        # 全部在 setup 阶段 ModuleNotFound（PR #126 实测），补进轻量依赖表。
+        run: pip install pytest pytest-timeout pyyaml fastapi pydantic jinja2 numpy prometheus-client python-multipart pillow httpx
       - name: Generate release metadata + SBOM
         # --no-model-hash：CI 无模型权重，跳过哈希以控制时长
         run: python scripts/build_release_metadata.py --version 0.0.0-ci --no-model-hash

@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod config;
+mod crash_telemetry;
 mod drag_drop;
 mod health_check;
 mod notification;
@@ -496,6 +497,10 @@ fn init_logging() {
 fn main() {
     // 初始化日志（RUST_LOG 可覆盖）
     init_logging();
+
+    // 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地）：
+    // 壳进程 panic 留痕到 logs/crash_reports/crash-shell-*.log（与 Python 侧同目录约定）
+    crash_telemetry::install(&resolve_app_dir());
 
     tauri::Builder::default()
         // 单实例：二次启动聚焦现有窗口而不是开新实例

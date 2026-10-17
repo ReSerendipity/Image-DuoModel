@@ -1,7 +1,7 @@
 {
-  "_comment": "分支保护单一来源。改这里 → 跑 python docs/ci/apply_branch_protection.py --apply。contexts 须与 .github/workflows/ci.yml 的 job name 逐字一致；e2e/performance 两个 job 因波动暂不作必需检查，其余 ci.yml job 全部阻断。",
+  "_comment": "分支保护单一来源。改这里 → 跑 python docs/ci/apply_branch_protection.py --apply。contexts 须与 .github/workflows/ci.yml 的 job name 逐字一致；e2e/performance 两个 job 因波动暂不作必需检查，其余 ci.yml job 全部阻断。例外（2026-10-17）：「Test + Coverage (Python 3.13)」不进 contexts——它在 ci.yml 里带 if: github.event_name != 'pull_request'，PR 事件上永不产出，列为必需检查只会让 PR 停在 Expected/BLOCKED（实测 PR 122），3.13 的兼容性覆盖仍由 push-to-main 与每日 schedule 真跑。要改成「3.13 也在 PR 上跑」需先修好台账 OPEN-1（该 job 当前在 main 上是红的），否则每个 PR 都会被一条真红的必需检查卡死。",
   "owner": "ReSerendipity",
-  "repo": "Image-MultiModel",
+  "repo": "Image-duoModel",
   "branch": "main",
   "policy": {
     "required_approving_review_count": 1,
@@ -24,7 +24,6 @@
   "contexts": [
     "Lint & Compile Check",
     "Test + Coverage (Python 3.12)",
-    "Test + Coverage (Python 3.13)",
     "Typecheck (mypy ratchet) / Typecheck (mypy ratchet)",
     "SAST - pip-audit",
     "Smoke Tests",
@@ -39,6 +38,7 @@
     "DCO Check"
   ],
   "required_conversation_resolution": false,
-  "_measured_at": "2026-09-28T10:25Z 首测；2026-10-07 复核校正：① repo 字段旧名 Image_MultiModel → Image-MultiModel（仓库已改名，GET 会跟随 307 重定向所以漂移检测一直“看起来正常”，但 PUT 不跟随，导致 --apply 实际写不进去）；② policy.required_approving_review_count 0 → 1，与本文件 _meets_reality/bypass_note 及 live 实测一致（GitHub 该字段最小值即为 1）；③ contexts 补 Lock Solvability (pip resolver dry-run) 与 DCO Check 两条——它们已在 live 与 ci.yml/dco.yml 的 job name 中真实存在，按本文件 _comment「contexts 须与 job name 逐字一致」补全，避免 --apply 把他人新增的必需检查静默摘掉。",
-  "_meets_reality": "live 已改为：require PR(1 approval) + enforce_admins=false；owner/admin 直推 main 免 PR，其余账号强制 PR。"
+  "_measured_at": "2026-09-28T10:25Z 首测；2026-10-07 复核校正：① repo 字段旧名 Image_MultiModel → Image-MultiModel（仓库已改名，GET 会跟随 307 重定向所以漂移检测一直“看起来正常”，但 PUT 不跟随，导致 --apply 实际写不进去）；② policy.required_approving_review_count 0 → 1，与本文件 _meets_reality/bypass_note 及 live 实测一致（GitHub 该字段最小值即为 1）；③ contexts 补 Lock Solvability (pip resolver dry-run) 与 DCO Check 两条——它们已在 live 与 ci.yml/dco.yml 的 job name 中真实存在，按本文件 _comment「contexts 须与 job name 逐字一致」补全，避免 --apply 把他人新增的必需检查静默摘掉。2026-10-17 再校正：仓库二次改名为 Image-duoModel（gh api repos/ReSerendipity/Image-MultiModel --jq .full_name 实测），repo 字段同步更新；同一机制再次生效——只读检测走 GET 会跟随重定向所以照旧“看起来正常”，名字漂移只有真正 --apply（PUT）才会暴露，故此处必须跟着改名。",
+  "_meets_reality": "live 已改为：require PR(1 approval) + enforce_admins=false；owner/admin 直推 main 免 PR，其余账号强制 PR。",
+  "_pending_approval": "2026-10-17 已执行（指挥方授权）：① repo 改名同步 + ② 从 required contexts 摘掉「Test + Coverage (Python 3.13)」后跑 --apply。远端回读：contexts 15→14、has3.13=false、strict=false、enforce_admins=false、required_approving_review_count=1 均未变（PUT 前逐字段与 live 比对过，含 allow_force_pushes/allow_deletions/block_creations/lock_branch/allow_fork_syncing/required_signatures/required_linear_history/required_conversation_resolution/restrictions，全部同值，故本次写入的唯一 delta 就是那条 context）。PR 122 回读：EXPECTED/QUEUED 状态的检查已归零，仍 BLOCKED 但原因变成它自己的真红检查 + 待审批（不再是结构性不可合）。未选「让 3.13 在 PR 上跑」：该 job 当前在 main 上是红的（台账 OPEN-1），那样改会让每个 PR 被一条真红的必需检查卡死。仍待修：OPEN-1 skip-quota 台账、OPEN-2 lock solvability、以及 ci.yml 里 3.13 的注释已与本决策对齐。"
 }

@@ -228,6 +228,15 @@ def launch():
     # 添加 app 到 sys.path
     sys.path.insert(0, str(APP_DIR))
 
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地）：
+    # 未捕获异常/硬崩溃留痕到 logs/crash_reports/，供 /api/metrics 与告警消费。
+    try:
+        from integrated_app.crash_telemetry import install as _install_crash_telemetry
+
+        _install_crash_telemetry(PROJECT_ROOT)
+    except Exception as _e:  # noqa: BLE001 - 观测装配失败不阻断启动
+        print(f"[WARN] crash telemetry install failed: {_e}")
+
     # 启动
     import uvicorn
 

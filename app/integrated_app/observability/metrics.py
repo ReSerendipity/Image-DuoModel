@@ -348,6 +348,46 @@ class MetricsRegistry:
             "Total disk space in bytes on the data volume root.",
         )
 
+        # ── 慢查询（v2.9 评估·后端服务设计 P1-1）──
+        self.db_slow_query_count = Gauge(
+            "db_slow_query_count",
+            "Slow SQL statements recorded by history_db since process start "
+            "(threshold IMM_SLOW_QUERY_MS, default 200ms).",
+        )
+
+        # ── 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地）──
+        self.crash_reports_total = Gauge(
+            "crash_reports_total",
+            "Local crash report files captured under logs/crash_reports (python + shell).",
+        )
+        self.crash_reports_recent_24h = Gauge(
+            "crash_reports_recent_24h",
+            "Crash report files created within the last 24 hours.",
+        )
+
+        # ── LLM 用量/延迟（v2.9 评估·LLM 应用工程 P1-2）──
+        self.llm_calls_total = Counter(
+            "llm_calls_total",
+            "LLM chat completion chain attempts by outcome (ok / error).",
+            labelnames=("outcome",),
+        )
+        self.llm_prompt_tokens_total = Counter(
+            "llm_prompt_tokens_total",
+            "Prompt tokens reported by LLM providers (0 when usage is not reported).",
+        )
+        self.llm_completion_tokens_total = Counter(
+            "llm_completion_tokens_total",
+            "Completion tokens reported by LLM providers (0 when usage is not reported).",
+        )
+        self.llm_last_latency_seconds = Gauge(
+            "llm_last_latency_seconds",
+            "Wall-clock duration of the last completed LLM chat call (whole turn).",
+        )
+        self.llm_first_token_last_seconds = Gauge(
+            "llm_first_token_last_seconds",
+            "Time to first content delta of the last streaming LLM chat call.",
+        )
+
         self._register_all()
 
     def _register_all(self) -> None:
@@ -377,6 +417,14 @@ class MetricsRegistry:
             "sse_events_dropped_total",
             "disk_free_bytes",
             "disk_total_bytes",
+            "db_slow_query_count",
+            "crash_reports_total",
+            "crash_reports_recent_24h",
+            "llm_calls_total",
+            "llm_prompt_tokens_total",
+            "llm_completion_tokens_total",
+            "llm_last_latency_seconds",
+            "llm_first_token_last_seconds",
         ):
             self._metrics.append(getattr(self, attr))
 

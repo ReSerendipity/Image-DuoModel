@@ -62,6 +62,8 @@ _RUNBOOK = {
     "queue_overload": "docs/runbooks/queue_overload.md",
     "disk_full": "docs/runbooks/disk_full.md",
     "generation_failures": "docs/runbooks/generation_failures.md",
+    "llm_token_budget": "docs/runbooks/llm_token_budget.md",
+    "crash_reports": "docs/runbooks/crash_reports.md",
 }
 
 
@@ -105,8 +107,7 @@ class AlertEngine:
                 "for_s": 300.0,
                 "check": lambda s: float(s.get("generation_failure_rate", 0.0)) > 0.05,
                 "message": lambda s: (
-                    f"生成失败率 {float(s.get('generation_failure_rate', 0.0)) * 100:.1f}% "
-                    f"超过 5% 阈值（持续 5min）"
+                    f"生成失败率 {float(s.get('generation_failure_rate', 0.0)) * 100:.1f}% 超过 5% 阈值（持续 5min）"
                 ),
                 "value": lambda s: float(s.get("generation_failure_rate", 0.0)),
             },
@@ -117,7 +118,7 @@ class AlertEngine:
                 "for_s": 300.0,
                 "check": lambda s: float(s.get("queue_fill_ratio", 0.0)) >= 0.85,
                 "message": lambda s: (
-                    f"队列填充率 {float(s.get('queue_fill_ratio', 0.0)) * 100:.0f}% " f">= 85%（持续 5min）"
+                    f"队列填充率 {float(s.get('queue_fill_ratio', 0.0)) * 100:.0f}% >= 85%（持续 5min）"
                 ),
                 "value": lambda s: float(s.get("queue_fill_ratio", 0.0)),
             },
@@ -126,18 +127,42 @@ class AlertEngine:
                 "severity": "critical",
                 "runbook": _RUNBOOK["gpu_oom"],
                 "for_s": 120.0,
-                "check": lambda s: (s.get("gpu_free_pct") is not None and float(s["gpu_free_pct"]) < 15.0),
-                "message": lambda s: (f"GPU 可用显存 {float(s.get('gpu_free_pct', 0.0)):.1f}% < 15%（持续 2min）"),
+                "check": lambda s: s.get("gpu_free_pct") is not None and float(s["gpu_free_pct"]) < 15.0,
+                "message": lambda s: f"GPU 可用显存 {float(s.get('gpu_free_pct', 0.0)):.1f}% < 15%（持续 2min）",
                 "value": lambda s: float(s.get("gpu_free_pct", 0.0)),
             },
             {
                 "name": "DiskSpaceLow",
                 "severity": "critical",
                 "runbook": _RUNBOOK["disk_full"],
-                "check": lambda s: (s.get("disk_free_pct") is not None and float(s["disk_free_pct"]) < 15.0),
+                "check": lambda s: s.get("disk_free_pct") is not None and float(s["disk_free_pct"]) < 15.0,
                 "for_s": 0.0,
-                "message": lambda s: (f"磁盘可用空间 {float(s.get('disk_free_pct', 0.0)):.1f}% < 15%"),
+                "message": lambda s: f"磁盘可用空间 {float(s.get('disk_free_pct', 0.0)):.1f}% < 15%",
                 "value": lambda s: float(s.get("disk_free_pct", 0.0)),
+            },
+            {
+                "name": "LLMTokenBudgetExceeded",
+                "severity": "warning",
+                "runbook": _RUNBOOK["llm_token_budget"],
+                "for_s": 0.0,
+                "check": lambda s: bool(s.get("llm_token_budget_exceeded")),
+                "message": lambda s: (
+                    f"LLM Token 用量 {float(s.get('llm_tokens_today', 0.0) or 0.0):.0f} "
+                    f"超过日预算 {float(s.get('llm_token_budget', 0.0) or 0.0):.0f}"
+                ),
+                "value": lambda s: float(s.get("llm_tokens_today", 0.0) or 0.0),
+            },
+            {
+                "name": "CrashReportsDetected",
+                "severity": "warning",
+                "runbook": _RUNBOOK["crash_reports"],
+                "for_s": 0.0,
+                "check": lambda s: float(s.get("crash_reports_recent", 0.0) or 0.0) > 0.0,
+                "message": lambda s: (
+                    f"24h 内新增崩溃留痕 {float(s.get('crash_reports_recent', 0.0) or 0.0):.0f} 份"
+                    "（会话崩溃率阈值 ≤ 0.1%，处置见 runbook）"
+                ),
+                "value": lambda s: float(s.get("crash_reports_recent", 0.0) or 0.0),
             },
         ]
 

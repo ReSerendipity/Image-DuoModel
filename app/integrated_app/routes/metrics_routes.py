@@ -17,9 +17,11 @@ from typing import Any
 
 from fastapi import APIRouter, Request, Response
 
+from ..agent.llm_client import llm_usage
 from ..config import get_config
 from ..cost_governance import get_metrics_store
 from ..gpu_utils import get_gpu_info
+from ..history_db import slow_query_stats
 from ..observability.alerts import get_alert_engine, health_unhealthy
 from ..observability.generation_metrics import classify_generation_error
 from ..observability.metrics import get_metrics
@@ -89,6 +91,22 @@ def _refresh_resource_gauges(request: Request) -> None:
     except Exception as e:  # noqa: BLE001
         logger.debug("refresh disk gauges failed: %s", e)
 
+    # 慢查询（history_db 模块级计数；v2.9 评估·后端服务设计 P1-1）
+    try:
+        m.db_slow_query_count.set(float(slow_query_stats.get("count", 0)))
+    except Exception as e:  # noqa: BLE001
+        logger.debug("refresh slow query gauge failed: %s", e)
+
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2，X2 局部落地）
+    try:
+        from ..crash_telemetry import count_crash_reports
+
+        crashes = count_crash_reports()
+        m.crash_reports_total.set(float(crashes.get("total", 0)))
+        m.crash_reports_recent_24h.set(float(crashes.get("recent", 0)))
+    except Exception as e:  # noqa: BLE001
+        logger.debug("refresh crash gauges failed: %s", e)
+
 
 @router.get("/metrics/prometheus")
 async def metrics(request: Request) -> Response:
@@ -133,12 +151,33 @@ def _build_alert_snapshot(request: Request) -> dict[str, Any]:
     d = _disk_info()
     disk_free_pct = (d["free"] / d["total"] * 100.0) if d["total"] else None
 
+    # LLM Token 日预算（v2.9 评估·LLM 应用工程 P1-2：budget=0 表示不启用）
+    llm_tokens_today = 0.0
+    try:
+        llm_tokens_today = float(llm_usage.snapshot().get("tokens_today", 0) or 0)
+    except Exception:  # noqa: BLE001
+        llm_tokens_today = 0.0
+    llm_token_budget = float(getattr(getattr(cfg, "finops", None), "budget_llm_tokens_per_day", 0) or 0)
+
+    # 本地崩溃遥测（v2.9 评估·运维稳定性 P1-2）
+    crash_recent = 0.0
+    try:
+        from ..crash_telemetry import count_crash_reports
+
+        crash_recent = float(count_crash_reports().get("recent", 0))
+    except Exception:  # noqa: BLE001
+        crash_recent = 0.0
+
     return {
         "queue_fill_ratio": fill_ratio,
         "generation_failure_rate": failure_rate,
         "gpu_free_pct": gpu_free_pct,
         "disk_free_pct": disk_free_pct,
         "health_unhealthy": health_unhealthy(),
+        "llm_tokens_today": llm_tokens_today,
+        "llm_token_budget": llm_token_budget,
+        "llm_token_budget_exceeded": bool(llm_token_budget > 0 and llm_tokens_today > llm_token_budget),
+        "crash_reports_recent": crash_recent,
         "now": time.time(),
     }
 
@@ -163,6 +202,9 @@ async def alerts(request: Request) -> dict[str, Any]:
             "gpu_free_pct": round(snapshot["gpu_free_pct"], 2) if snapshot["gpu_free_pct"] is not None else None,
             "disk_free_pct": round(snapshot["disk_free_pct"], 2) if snapshot["disk_free_pct"] is not None else None,
             "health_unhealthy": snapshot["health_unhealthy"],
+            "llm_tokens_today": snapshot.get("llm_tokens_today", 0.0),
+            "llm_token_budget": snapshot.get("llm_token_budget", 0.0),
+            "llm_token_budget_exceeded": snapshot.get("llm_token_budget_exceeded", False),
         },
         "alerts": [a.to_dict() for a in active],
         "firing_count": sum(1 for a in active if a.firing),

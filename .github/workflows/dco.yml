@@ -68,7 +68,12 @@ jobs:
               echo "::error::Commit $commit (author <$author_email>) is missing 'Signed-off-by:' trailer (run: git commit -s)"
               fails=1
             fi
-          done < <(git rev-list "$base_sha..$head_sha")
+          # --no-merges：GitHub 的「Update branch」/ 网页端合并按钮生成的合并提交
+          # 由平台用账号公开邮箱落笔，无法携带 Signed-off-by；把它们计入会让
+          # 「把 base 合进 PR 分支」这一正当操作本身把必需检查判红（2026-10-17 实测
+          # 8 条 dependabot PR 因此全红）。DCO 要认证的是**内容提交**，逐条内容提交
+          # 仍全部检查；与家族 GalgameShell 的同名门禁同口径。
+          done < <(git rev-list --no-merges "$base_sha..$head_sha")
           # 区间为空说明 base/head 取错了（PR 不可能零 commit）——静默 exit 0 会
           # 把「一条都没查」报成绿色，这里按失败处理。
           if (( human + bot == 0 )); then

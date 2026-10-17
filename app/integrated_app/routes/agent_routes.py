@@ -414,10 +414,18 @@ async def agent_health(request: Request) -> dict[str, Any]:
     orchestrator: AgentOrchestrator | None = getattr(request.app.state, "agent_orchestrator", None)
     llm = orchestrator.llm if orchestrator is not None else LLMClient()
     llm_ok = await llm.health_check()
+    # 降级链状态（v2.9 评估·LLM 应用工程 P1-1）：fallback_configured 表示已配置
+    # 降级端点；fallback_ok 为降级端点探测结果（未配置时为 null）。
+    fallback_configured = bool(getattr(llm, "fallback_configured", False))
+    fallback_ok: bool | None = None
+    if fallback_configured:
+        fallback_ok = await llm.health_check(llm.config.fallback_base_url, llm.config.fallback_api_key)
     return {
         "llm_ok": llm_ok,
         "llm_base_url": llm.config.base_url,
         "llm_model": llm.config.model,
+        "fallback_configured": fallback_configured,
+        "fallback_ok": fallback_ok,
         "mode": getattr(orchestrator, "mode", MODE_AUTO) if orchestrator else MODE_AUTO,
     }
 

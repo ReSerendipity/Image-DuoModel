@@ -33,6 +33,37 @@ def _escape_like(s: str) -> str:
 
 logger = logging.getLogger(__name__)
 
+# ── 慢查询观测（v2.9 评估·后端服务设计 P1-1）──────────────────
+# 阈值（毫秒）：单条语句执行耗时超过阈值即记录 WARNING（含耗时与 SQL 摘要）。
+# 默认 200ms；环境变量 IMM_SLOW_QUERY_MS 可覆盖；设为 0 记录全部语句（测试用），
+# 负数完全关闭。计数经 routes/metrics_routes.py 暴露为 db_slow_query_count gauge，
+# 支撑「慢查询 → 优化 → 复评」闭环度量。
+SLOW_QUERY_THRESHOLD_MS: float = float(os.environ.get("IMM_SLOW_QUERY_MS", "200") or 200)
+
+slow_query_stats: dict[str, Any] = {
+    "count": 0,
+    "last_ms": 0.0,
+    "last_sql": "",
+}
+
+
+def _maybe_record_slow_query(t0: float, sql: Any) -> None:
+    """耗时超阈值时记录慢查询；观测自身的任何异常都不得影响 DB 调用。"""
+    try:
+        threshold = SLOW_QUERY_THRESHOLD_MS
+        if threshold < 0:
+            return
+        duration_ms = (time.perf_counter() - t0) * 1000.0
+        if duration_ms < threshold:
+            return
+        summary = " ".join(str(sql).split())[:200] if sql else ""
+        slow_query_stats["count"] = int(slow_query_stats.get("count", 0)) + 1
+        slow_query_stats["last_ms"] = round(duration_ms, 1)
+        slow_query_stats["last_sql"] = summary
+        logger.warning("[SLOW-QUERY] %.1fms (threshold=%.0fms): %s", duration_ms, threshold, summary)
+    except Exception:  # noqa: BLE001 - 观测永不阻断业务
+        logger.debug("slow query record failed", exc_info=True)
+
 
 class HistoryDBClosedError(RuntimeError):
     """在 ``HistoryDB.close()`` 之后仍尝试使用数据库连接。
@@ -85,12 +116,20 @@ class _GuardedConnection:
     def execute(self, *args: Any, **kwargs: Any) -> sqlite3.Cursor:
         lock = object.__getattribute__(self, "_lock")
         with lock:
-            return self._require().execute(*args, **kwargs)
+            t0 = time.perf_counter()
+            try:
+                return self._require().execute(*args, **kwargs)
+            finally:
+                _maybe_record_slow_query(t0, args[0] if args else "")
 
     def executescript(self, *args: Any, **kwargs: Any) -> sqlite3.Cursor:
         lock = object.__getattribute__(self, "_lock")
         with lock:
-            return self._require().executescript(*args, **kwargs)
+            t0 = time.perf_counter()
+            try:
+                return self._require().executescript(*args, **kwargs)
+            finally:
+                _maybe_record_slow_query(t0, args[0] if args else "")
 
     def commit(self) -> None:
         lock = object.__getattribute__(self, "_lock")

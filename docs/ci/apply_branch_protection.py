@@ -19,8 +19,20 @@ CFG = os.path.join(os.path.dirname(HERE), "ci", "branch-protection.json")
 
 
 def gh(args: list[str]) -> tuple[int, str, str]:
-    """调用 gh api，返回 (returncode, stdout, stderr)。"""
-    r = subprocess.run(["gh", "api", *args], capture_output=True, text=True, check=False)
+    """调用 gh api，返回 (returncode, stdout, stderr)。
+
+    显式 utf-8：Windows 下 text=True 会按 GBK 解码，gh 输出里的非 GBK 字节
+    （job 名、错误详情）会在读取线程抛 UnicodeDecodeError，把真实返回信息吞成
+    一段 traceback——本脚本 2026-10-17 实跑 --apply 时就是这样炸的。
+    """
+    r = subprocess.run(  # nosec B603（固定参数调用 gh，无 shell=True）
+        ["gh", "api", *args],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
     return r.returncode, (r.stdout or "").strip(), (r.stderr or "").strip()
 
 

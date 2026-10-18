@@ -328,7 +328,11 @@ jobs:
           python-version: "3.12"
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # jsdom 30（本 PR）声明 node ^22.22.2 || ^24.15.0 || >=26，其依赖 undici
+          # 8.11.2 声明 >=22.19.0 —— 在 Node 20 上运行报
+          # TypeError: webidl.util.markAsUncloneable is not a function（undici 的
+          # cachestorage 初始化，PR #110 实测）。跟依赖的要求抬到 22。
+          node-version: "22"
       - name: Install Python dependencies
         # 去掉 `|| true`：实测本步骤当前在 runner 上成功（2026-09-24 CI run
         # 35950085383 全量 requirements.txt 装入无 ERROR），容错只会把

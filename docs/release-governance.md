@@ -14,13 +14,14 @@
 ## 1. 版本号规范
 
 - 遵循 **SemVer** `MAJOR.MINOR.PATCH`；预发布用 `-alpha.N` / `-beta.N` / `-rc.N`（同 §10.2）。
-- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **1.3.0**）。
+- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **1.3.0**，为该仓既有滞后值；当前**版本基线为 `v2.0.0`**，由 release-please 托管的 `version.txt` 承载，见下）。
 - 必须同步的其它版本位：
   - `CHANGELOG.md`（发版节标题 `[X.Y.Z] - YYYY-MM-DD`）
   - `AGENTS.md` 顶部「对应项目版本」（本地维护、不入库，见家族规范 §7）
-- 版本位漂移校验入口：`tests/test_version_consistency.py`——当前仅扫描源码中硬编码旧版本（0.1.0 / 0.0.1）；**跨位点一致性自动对账 待定（负责人 + 触发条件：阶段 B 随 release-please 恢复时补全位点清单与断言）**。
-- **自动化方式（目标态）**：恢复 release-please（自动），`extra-files` 只接 json/toml，`config.yaml` 绝不交给 release-please。当前为手动 tag 流程（`release.yml` tag 驱动；release-please.yml / config / manifest 三件套已于 2026-09-05 停用并删除）。
-  > ⚠️ release-please workflow 的恢复属**阶段 B**；本单只写目标态，不新建任何 workflow 文件。恢复后须明确：哪些位自动改、哪些位必须人补。远端 v1.5.0 / v1.5.1 tag 为 release-please 时代历史产物，原地保留、不再延续、不作为版本基线。
+- 版本位漂移校验入口：`tests/test_version_consistency.py`——当前仅扫描源码中硬编码旧版本（0.1.0 / 0.0.1）；**跨位点一致性自动对账 待定（负责人 + 触发条件：补全 `version.txt` / `config.yaml` / `CHANGELOG.md` 三点的断言）**。
+- **自动化方式（2026-10-18 已恢复自动）**：`release-please.yml` + `release-please-config.json` + `.release-please-manifest.json` 三件套已恢复（manifest 与 `version.txt` 基线均为 `2.0.0`），采用 `release-type: simple`。
+- **位点分工**：`version.txt` 由 release-please **自动**改写并据此打 tag；`config.yaml` 顶层 `version` **绝不交给 release-please**（遵从本仓既有约束），须在合并 release PR 时**人工补齐**；tag 打出后由 `release.yml` 在远端构建产物。
+  > 说明（2026-10-18）：release-please 已按上条恢复；「哪些位自动改、哪些位必须人补」已在上条写明。远端 `v1.5.0` / `v1.5.1` 为 release-please 时代历史产物，原地保留、不再延续、不作为版本基线；当前版本基线为 `v2.0.0`。
 
 ## 2. CHANGELOG 管理
 
@@ -31,10 +32,10 @@
 公共流程同 §10.2 / 模板 §3，本仓特有项：
 
 1. 确认 `[Unreleased]` 条目完整
-2. 同步版本位：`config.yaml` + `CHANGELOG.md`（+ 本地 `AGENTS.md`）三处一致
+2. 同步版本位：release PR 自动改 `version.txt` 后，**人工补** `config.yaml` + `CHANGELOG.md`（+ 本地 `AGENTS.md`）使其一致
 3. 版本依赖：仅 `pyproject.toml` 声明源；依赖改动补 `requirements.txt` / `requirements-lock.txt`
 4. 本地打 tag 并推送：`git tag v<X.Y.Z>` → `git push origin v<X.Y.Z>`
-5. 远端凭 tag 触发 **`release.yml`** 构建产物（当前手动 tag 驱动；目标态为 release-please 自动开 Release PR，见 §1）
+5. 远端凭 tag 触发 **`release.yml`** 构建产物（release-please 自动开 Release PR 并打 tag，见 §1；应急仍可手动 `git tag`）
 6. 远端建 Release 并挂资产 → 盯 `gh run list` 到终态；红了当场修或 revert 止损
 
 ## 4. 分发产物与完整性

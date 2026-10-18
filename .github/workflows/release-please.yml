@@ -1,0 +1,43 @@
+name: Release Please
+
+# 治理规范 §10.2 / 2026-10-18 裁决：恢复 release-please 自动发版（推翻本仓 2026-09-05 的自停决定），
+# 与 TTS-MultiModel 的自动化口径统一。分工：release-please 负责开 release PR + 打 tag；
+# 打出的 v* tag 再触发本仓既有 release.yml 在远端构建资产（§10.1 远端优先，本地不出包）。
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # release-please 靠 tag 定位「上一个 release」，默认浅检出拿不到 tag 会静默空转。
+          fetch-depth: 0
+          persist-credentials: true
+
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          target-branch: main
+          include-component-in-tag: false
+
+      - name: 结果写进 job 摘要（避免「什么都没发生」被当成成功）
+        env:
+          CREATED: ${{ steps.rp.outputs.release_created || '' }}
+          PR: ${{ steps.rp.outputs.pr || '' }}
+          TAG: ${{ steps.rp.outputs.tag_name || '' }}
+        run: |
+          set -eu
+          {
+            echo "## release-please"
+            echo "- release_created: `${CREATED:-false}`"
+            echo "- release PR: `${PR:-（本次没有开）}`"
+            echo "- tag: `${TAG:-无}`"
+          } >> "$GITHUB_STEP_SUMMARY"

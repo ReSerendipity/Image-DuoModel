@@ -71,11 +71,8 @@ root_allowlist:
   - Dockerfile
   - LICENSE
   - NOTICE
-  - PRIVACY_POLICY.md
   - README.md
   - SECURITY.md
-  - THIRD_PARTY_NOTICES.md
-  - USER_AGREEMENT.md
   - app
   - config.yaml
   - data
@@ -85,9 +82,7 @@ root_allowlist:
   - docker-compose.yml
   - docs
   - install.bat
-  - install.sh
   - model
-  - precheck.ps1
   - pyproject.toml
   - release
   - release-signing-public-key.asc
@@ -95,5 +90,4 @@ root_allowlist:
   - requirements.txt
   - scripts
   - start.bat
-  - start.sh
   - tests

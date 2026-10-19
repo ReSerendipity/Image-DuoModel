@@ -5,8 +5,8 @@
 # Detects Python 3.10+ and launches the application.
 #
 # Usage:
-#   chmod +x start.sh
-#   ./start.sh
+#   chmod +x scripts/start.sh
+#   ./scripts/start.sh
 #
 
 set -e
@@ -16,8 +16,8 @@ echo "  Image MultiModel - Multi-Model AI Image Generation"
 echo "============================================================"
 echo ""
 
-# Change to script directory
-cd "$(dirname "$0")"
+# Change to repo root（脚本已迁入 scripts/，锚定到上级仓根，保持“从仓根运行”语义）
+cd "$(dirname "$0")/.."
 
 # ── Detect Python interpreter ──────────────────────────
 PYTHON_CMD=""
@@ -66,7 +66,7 @@ if [ -z "$PYTHON_CMD" ]; then
     echo "  macOS (Homebrew):"
     echo "    brew install python@3.12"
     echo ""
-    echo "  Then run install.sh to install dependencies."
+    echo "  Then run ./scripts/install.sh to install dependencies."
     echo ""
     echo "============================================================"
     exit 1

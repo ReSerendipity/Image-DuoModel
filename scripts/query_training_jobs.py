@@ -2,7 +2,7 @@
 """scripts/query_training_jobs.py — 训练 job 只读查询 CLI（MLOps M5）。
 
 把散落的 ``data/training/jobs/<job_id>.json`` 抽成可过滤的只读视图，替代过去对
-``docs/agents/GOTCHAS.md`` 的 grep 式回忆。本脚本**只读**：不写、不删、不提交任何 job。
+``local/agents/GOTCHAS.md`` 的 grep 式回忆。本脚本**只读**：不写、不删、不提交任何 job。
 
 用法示例::
 

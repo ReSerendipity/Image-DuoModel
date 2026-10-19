@@ -10,7 +10,7 @@
 - **默认引擎 `z_image_turbo_native`（backend: native）**：进程内复用 vendored
   `comfy_kernel/`（ComfyUI 内核源码）。**该内核按 [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html) 授权**——
   分发本项目须遵守 GPL-3.0 义务（随附许可文本、提供源码获取方式、保留版权声明），
-  详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+  详见 [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。
 
 ## 模型权重许可声明（独立于代码）
 
@@ -22,4 +22,4 @@
   按 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) 授权；
   再分发需保留原版权声明。
 
-> 第三方 Python 依赖的完整许可清单见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+> 第三方 Python 依赖的完整许可清单见 [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。

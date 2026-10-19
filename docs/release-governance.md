@@ -95,7 +95,7 @@
 - [ ] CHANGELOG `[Unreleased]` 已改版本 + 日期
 - [ ] 全量 `pytest tests/ --cov=app/integrated_app --cov-fail-under=65` 通过
 - [ ] `ruff` / `ruff-format` 全绿
-- [ ] `precheck.ps1 -Full` 通过；`python scripts/check_spec_refs.py` 退出码 0
+- [ ] `scripts/precheck.ps1 -Full` 通过；`python scripts/check_spec_refs.py` 退出码 0
 - [ ] 引擎 / 权重改动时 `scripts/check_config_refs.py` 对账通过
 - [ ] **本地未产出任何发布交付物**（全部远端构建，同 §0）
 - [ ] tag 已推送

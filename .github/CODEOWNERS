@@ -25,7 +25,7 @@ scripts/generate_manifest_signing_key.py @ReSerendipity
 
 # 安全策略与门禁声明
 .github/SECURITY.md @ReSerendipity
-SECURITY_MATRIX.md @ReSerendipity
+docs/SECURITY_MATRIX.md @ReSerendipity
 .github/workflows/ @ReSerendipity
 .github/CODEOWNERS @ReSerendipity
 

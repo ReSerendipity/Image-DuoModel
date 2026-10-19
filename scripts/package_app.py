@@ -79,9 +79,9 @@ ROOT_EXTRA = [
     "LICENSE",
     "NOTICE",
     "SECURITY.md",
-    "PRIVACY_POLICY.md",
-    "USER_AGREEMENT.md",
-    "THIRD_PARTY_NOTICES.md",
+    "docs/PRIVACY_POLICY.md",
+    "docs/USER_AGREEMENT.md",
+    "docs/THIRD_PARTY_NOTICES.md",
 ]
 
 
@@ -140,13 +140,13 @@ def build_payload(tmp: Path) -> None:
     if (ROOT / "bin").exists():
         _copy_tree(ROOT / "bin", tmp / "bin")
 
-    # 3. 根级合规/配置文本
+    # 3. 根级合规/配置文本（docs/ 下的合规文书平铺到包根，保持包根既有布局）
     for name in ROOT_EXTRA:
         src = ROOT / name
         if src.is_file():
             import shutil
 
-            shutil.copy2(src, tmp / name)
+            shutil.copy2(src, tmp / Path(name).name)
 
     # 4. version.json（config.yaml 权威位）
     v = app_version()

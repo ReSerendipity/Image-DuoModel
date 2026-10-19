@@ -5,9 +5,9 @@
 
 ## 1. 许可与发布形态
 
-1.1 项目代码适用 [Apache License 2.0](LICENSE)，可自由使用、修改、再分发（保留版权声明与 LICENSE 副本）。
+1.1 项目代码适用 [Apache License 2.0](../LICENSE)，可自由使用、修改、再分发（保留版权声明与 LICENSE 副本）。
 
-1.2 **模型权重许可独立于代码**：各引擎权重许可不同（Z-Image-Turbo 为 Apache-2.0；旧版 native 引擎的 ComfyUI 内核为 GPL-3.0）——使用前请核对引擎仓库 LICENSE 与 [NOTICE](NOTICE)，商用场景按各许可要求取得授权。
+1.2 **模型权重许可独立于代码**：各引擎权重许可不同（Z-Image-Turbo 为 Apache-2.0；旧版 native 引擎的 ComfyUI 内核为 GPL-3.0）——使用前请核对引擎仓库 LICENSE 与 [NOTICE](../NOTICE)，商用场景按各许可要求取得授权。
 
 ## 2. 合法使用承诺
 
@@ -27,7 +27,7 @@
 
 ## 4. 第三方明示
 
-第三方组件与许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；模型权重许可见 [NOTICE](NOTICE)。
+第三方组件与许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；模型权重许可见 [NOTICE](../NOTICE)。
 
 ## 5. 免责与责任限制
 

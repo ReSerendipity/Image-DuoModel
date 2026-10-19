@@ -153,8 +153,8 @@ Image-MultiModel/
 ├── config.yaml                   # 应用配置（版本权威位）
 ├── pyproject.toml                # 工具配置（pytest / ruff / coverage）
 ├── requirements.txt / requirements-lock.txt
-├── start.bat / install.bat / start.sh / install.sh
-└── README.md / CHANGELOG.md / THIRD_PARTY_NOTICES.md
+├── start.bat / install.bat
+└── README.md / CHANGELOG.md / LICENSE / NOTICE
 ```
 
 ---

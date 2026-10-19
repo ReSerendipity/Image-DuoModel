@@ -91,7 +91,7 @@
   - **观察（未改代码）**：preflight 日志里 `latent_format = NoneType`，即 Qwen-Image 的 model 对象不挂 `latent_format` 属性，latent 尺寸实际由 `config.yaml` 的 `latent_channels=64` / `latent_downscale=16` 驱动（与实测一致）。**改这两个 config 值前必须重跑 preflight**，否则会静默按旧尺寸造 latent。
 
 - ✅ **`krea2_turbo_native` 已于 2026-10-02 实证出图闭环（2026-10-01 评估时的「权重阻断」结论同样被推翻）**：`config.yaml` 已注册 `krea2_turbo_native`（`backend: native` / `supported_features: [txt2img]` / `unet.key_prefix: model.diffusion_model.` / `text_encoder.clip_type: krea2` / `latent_channels: 16` / `latent_downscale: 8` / `sampler=euler` / `scheduler=simple`）；新增 `scripts/preflight_krea2_turbo.py` 与回归测试 `tests/native/test_krea2_turbo_native.py`（17 例：config 结构/权重存在/两处新字段/sampler 与 preflight COMBOS 首项同步、加载选项解析不污染路径字典、executor 两处加载定制的委托行为、engine→executor 合并传参的变异可测断言）。
-  推翻要点（详见 `docs/agents/GOTCHAS.md` #41/#42）：
+  推翻要点（详见 `local/agents/GOTCHAS.md` #41/#42）：
   - **权重其实一直在本机**：`unet/Krea2-turbo/`、`text_encoders/Krea2/`、`vae/Qwen-image-2512-edit + Krea2/` 三处都在 ComfyUI 模型库里，只是本仓 `pretrained_models/` 没挂 junction、config 没写；上一版「权重阻断」是把 `pretrained_models/*` 下**已 junction 的三组**当成了全部。
   - **UNET 只能用 AIO 那份**：同目录 `krea2_turbo_fp8_scaled.safetensors` 被 safetensors rust 后端 0.8.0 拒绝（`file not fully covered`，多轮受控对照实验排除 junction/体积/头覆盖/量化元数据后判定为该文件 fp8 描述符问题）；AIO 那份走「`load_torch_file` → 剥 `model.diffusion_model.` 前缀 → `load_diffusion_model_state_dict`」（`load_diffusion_model` 无 prefix 参数）。
   - **TE 必须枚举、latent 必须 5D**：Krea2 的 TE 要 `CLIPType.KREA2` **枚举**（字符串 `"krea2"` 不等价 → 单层 2560 维 → 前向 30720 维报错）；latent 必须 `[1,16,1,H/8,W/8]`，4D 会被当 16 个时间帧产出 61 帧废图（已目检）。
@@ -100,7 +100,7 @@
   - `ModelPaths.sub_paths`（同角色的附加权重，各带自己的 `sub_dir`）——FLUX 的 clip_l 挂在 `models/clip/FLUX.1-dev/`、t5xxl 挂在 `models/text_encoders/FLUX-1-dev/`，现有「一角色一 sub_dir」表达不了；
   - `EngineConfig.guidance`（FLUX 系 guidance，0 = 不注入，沿用 `model_base.Flux.concat_cond` 内建 3.5）。
   新增 `scripts/preflight_flux1_dev.py` 与回归测试 `tests/native/test_flux1_dev_native.py`（18 例，含三处接线的**变异验证**）。**至此 P2-multi-engine D 项目标引擎全部实证收口，无未开工项。**
-  推翻要点（详见 `docs/agents/GOTCHAS.md` #43 及 43.1/43.2/43.3）：
+  推翻要点（详见 `local/agents/GOTCHAS.md` #43 及 43.1/43.2/43.3）：
   - **权重一直在本机**：`unet/FLUX-1-dev/` 4 份 + `text_encoders/FLUX-1-dev/t5xxl_fp8_e4m3fn.safetensors` + `clip/FLUX.1-dev/clip_l.safetensors` + `vae/FLUX.1-dev(Z-image(turbo))/ae.safetensors` 全在 ComfyUI 模型库，只是没建 junction、没写 config。
   - **选 `fluxNSFWUNLOCKED`**：fp8 **E4M3**（`Flux-Capacity-NSFW-V2-fp8` 是 E5M2 精度更差），且键带 `model.diffusion_model.` 前缀可直接复用剥前缀逻辑；另两份 `pornworks*` 是裸键。
   - **三处架构适配**（缺一不动图）：双 TE 一次 `load_clip` 传两个文件 / guidance 手工注入 cond 字典（executor 无 comfy_extras `Guidance` 节点）/ latent 是 **4D `[1,16,H/8,W/8]`**（`latent_formats.Flux` 继承 SD3，与 Krea2 的 5D 相反）。

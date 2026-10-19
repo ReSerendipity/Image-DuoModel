@@ -5,7 +5,7 @@
 
 ## 项目主许可
 
-Image MultiModel 项目代码采用 [Apache License 2.0](LICENSE)。
+Image MultiModel 项目代码采用 [Apache License 2.0](../LICENSE)。
 
 ## 核心推理引擎
 

@@ -8,8 +8,8 @@
 #   3. Create required directories
 #
 # Usage:
-#   chmod +x install.sh
-#   ./install.sh
+#   chmod +x scripts/install.sh
+#   ./scripts/install.sh
 #
 
 set -e
@@ -26,8 +26,8 @@ echo ""
 echo "============================================================"
 echo ""
 
-# Change to script directory
-cd "$(dirname "$0")"
+# Change to repo root（脚本已迁入 scripts/，锚定到上级仓根，保持“从仓根运行”语义）
+cd "$(dirname "$0")/.."
 
 # ── Detect Python interpreter ──────────────────────────
 PYTHON_CMD=""
@@ -145,7 +145,7 @@ echo "  Installation Complete!"
 echo "============================================================"
 echo ""
 echo "You can now start the application by running:"
-echo "  ./start.sh"
+echo "  ./scripts/start.sh"
 echo "  # or"
 echo "  python bin/clean_launch.py"
 echo ""

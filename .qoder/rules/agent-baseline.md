@@ -7,7 +7,7 @@ paths:
 
 > 本文件随仓库分发（git 跟踪），是任何克隆 / CI 检出都能读到的**最小恒需约束集**。
 > 更完整的治理文档（自进化协议、SOP、坑点累积、修订表）由维护者**本地保留**，未随仓库发布：
-> 若工作区存在根 `AGENTS.md` 或 `docs/agents/` 下的细化文档，以它们为准；
+> 若工作区存在根 `AGENTS.md` 或 `local/agents/` 下的细化文档，以它们为准；
 > 冲突时的优先级：**代码与配置 > 本地 `AGENTS.md` > 本文件 > `README.md`**。
 > 机器可验证的公开硬约束全文见 `docs/AGENT_CONSTRAINTS.md`（跟踪文件，随仓库分发）。
 
@@ -26,13 +26,13 @@ paths:
 - type：`python -m mypy app/integrated_app`
 - 测试 + 覆盖率：`pytest tests/ --cov=app/integrated_app --cov-report=term-missing --cov-fail-under=65 -q`
   （红线 65%，事实来源 `pyproject.toml` 的 fail_under；权威门禁由 **CI** 执行）
-- push 前本地预检：`./precheck.ps1`（默认仅 lint/type、尽力而为；需本地覆盖率加 `-Full`）
+- push 前本地预检：`scripts/precheck.ps1`（默认仅 lint/type、尽力而为；需本地覆盖率加 `-Full`）
 - 文档路径引用完整性：`python scripts/check_spec_refs.py --self`
 - 新克隆后启用钩子：`git config core.hooksPath .githooks`（或运行 `.githooks/install.sh`）
 
 ## 3. 🔌 入口、端口与调度
 
-- 启动入口 `app/clean_launch.py`（或根 `start.bat` / `start.sh`），默认 `http://127.0.0.1:8288`。
+- 启动入口 `app/clean_launch.py`（或根 `start.bat` / `scripts/start.sh`），默认 `http://127.0.0.1:8288`。
 - **只绑回环**：禁止 `0.0.0.0` 等全接口暴露；事实来源 `config.yaml` 的 `server.host` / `server.port`
   与 `app/integrated_app/config_models.py` 的 host 白名单校验器（非法值直接抛错）。
 - 单 Worker 串行调度防 GPU OOM：`config.yaml` 的 `server.workers: 1`。
@@ -44,7 +44,7 @@ paths:
   不用 `--no-verify` 绕过钩子。
 - 动手修 CI 红灯前先读交接台账 `docs/runbooks/ci_fix_ledger.md`（随仓库分发）：**同一失败签名
   第二次出现禁止再朝同方向重试**，必须读完整失败日志或 `git revert` 换策略。
-- 修复 Bug / 踩坑后须把坑点追加到 `docs/agents/GOTCHAS.md`（该文件随仓库分发）。
+- 修复 Bug / 踩坑后须把坑点追加到 `local/agents/GOTCHAS.md`（该文件随仓库分发）。
 
 ## 5. 🧹 构建产物滚动清理
 

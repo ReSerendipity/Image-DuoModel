@@ -41,7 +41,7 @@ curl -s http://127.0.0.1:8288/api/health | python -m json.tool
 # Windows
 start.bat
 # Linux
-./start.sh
+./scripts/start.sh
 
 # 重启后确认健康
 curl -s http://127.0.0.1:8288/api/health | grep -q '"status":"ok"' && echo "HEALTHY"

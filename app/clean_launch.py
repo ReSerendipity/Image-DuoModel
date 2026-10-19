@@ -110,7 +110,7 @@ def check_dependencies():
             print(f"[INFO] 从锁定文件安装（版本钉死，避免投毒）: {lock}")
             subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", str(lock)])
         else:
-            print(f"[ERROR] 依赖缺失且未找到锁定文件 {lock}，请先运行 install.bat/install.sh")
+            print(f"[ERROR] 依赖缺失且未找到锁定文件 {lock}，请先运行 install.bat/scripts/install.sh")
             print("        或手动执行: pip install -r requirements-lock.txt")
             sys.exit(1)
         print("[OK] Dependencies installed")

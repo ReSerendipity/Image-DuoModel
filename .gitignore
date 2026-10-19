@@ -32,6 +32,11 @@ ENV/
 # AI 规范（仅本地保留，不上远程，家族统一约定）
 AGENTS.md
 
+# 仅本地容器：内部说明、agent 上下文、实验记录、纯历史（§13.1 唯一 ignore 容器）
+# 本仓为私有仓：迁移前已跟踪的 local/ 下文件（如 local/agents/GOTCHAS.md）随仓保留，
+# 新增的 local/ 内容不入库。
+/local/
+
 # 内部/本地规则（仅本地保留，不上远程，避免暴露本地信息）
 LOCAL_RULES.md
 

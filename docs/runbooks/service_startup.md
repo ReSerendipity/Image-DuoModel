@@ -50,7 +50,7 @@ tail -n 100 logs/*.log
   # Windows
   start.bat
   # Linux
-  ./start.sh
+  ./scripts/start.sh
   ```
 - 回滚后必须重跑 startup-smoke（boot → health → 假任务 → 关闭）。
 

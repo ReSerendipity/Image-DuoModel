@@ -1,6 +1,6 @@
 {
-    "changelog":  "v1.3.0：三处版本位同步（config.yaml 权威位），桌面分发层与 L2 增量包对齐",
-    "version":  "1.3.0",
+    "changelog":  "v2.0.0：应用版本位对齐 release-please 2.x 在途线（2026-10-20 裁决，权威位 .release-please-manifest.json = 2.0.0），桌面分发层同步；release_date 保留历史值",
+    "version":  "2.0.0",
     "release_date":  "2026-10-03",
     "minimum_shell_version":  "1.0.0"
 }

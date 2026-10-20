@@ -14,14 +14,14 @@
 ## 1. 版本号规范
 
 - 遵循 **SemVer** `MAJOR.MINOR.PATCH`；预发布用 `-alpha.N` / `-beta.N` / `-rc.N`（同 §10.2）。
-- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **2.0.0**，与应用版本基线 `v2.0.0` 对齐；基线由 release-please 托管的 `version.txt` 承载，见下）。
+- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **2.1.0**，与应用版本基线 `v2.1.0` 对齐；基线由 release-please 托管的 `version.txt` 承载，见下）。
 - 必须同步的其它版本位：
   - `CHANGELOG.md`（发版节标题 `[X.Y.Z] - YYYY-MM-DD`）
   - `AGENTS.md` 顶部「对应项目版本」（本地维护、不入库，见家族规范 §7）
 - 版本位漂移校验入口：`tests/test_version_consistency.py`——当前仅扫描源码中硬编码旧版本（0.1.0 / 0.0.1）；**跨位点一致性自动对账 待定（负责人 + 触发条件：补全 `version.txt` / `config.yaml` / `CHANGELOG.md` 三点的断言）**。
-- **自动化方式（2026-10-18 已恢复自动）**：`release-please.yml` + `release-please-config.json` + `.release-please-manifest.json` 三件套已恢复（manifest 与 `version.txt` 基线均为 `2.0.0`），采用 `release-type: simple`。
+- **自动化方式（2026-10-18 已恢复自动）**：`release-please.yml` + `release-please-config.json` + `.release-please-manifest.json` 三件套已恢复（manifest 与 `version.txt` 基线均为 `2.1.0`），采用 `release-type: simple`。
 - **位点分工**：`version.txt` 由 release-please **自动**改写并据此打 tag；`config.yaml` 顶层 `version` **绝不交给 release-please**（遵从本仓既有约束），须在合并 release PR 时**人工补齐**；tag 打出后由 `release.yml` 在远端构建产物。
-  > 说明（2026-10-18）：release-please 已按上条恢复；「哪些位自动改、哪些位必须人补」已在上条写明。远端 `v1.5.0` / `v1.5.1` 为 release-please 时代历史产物，原地保留、不再延续、不作为版本基线；当前版本基线为 `v2.0.0`。
+  > 说明（2026-10-18）：release-please 已按上条恢复；「哪些位自动改、哪些位必须人补」已在上条写明。远端 `v1.5.0` / `v1.5.1` 为 release-please 时代历史产物，原地保留、不再延续、不作为版本基线；当前版本基线为 `v2.1.0`。
 
 ## 2. CHANGELOG 管理
 

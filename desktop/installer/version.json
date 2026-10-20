@@ -1,6 +1,6 @@
 {
-    "changelog":  "v2.0.0：应用版本位对齐 release-please 2.x 在途线（2026-10-20 裁决，权威位 .release-please-manifest.json = 2.0.0），桌面分发层同步；release_date 保留历史值",
-    "version":  "2.0.0",
-    "release_date":  "2026-10-03",
+    "changelog":  "v2.1.0：应用版本位对齐 release-please 2.1.0 权威线（2026-10-20 发布，权威位 .release-please-manifest.json = 2.1.0），桌面分发层同步；release_date 更新为实际发布日",
+    "version":  "2.1.0",
+    "release_date":  "2026-10-20",
     "minimum_shell_version":  "1.0.0"
 }

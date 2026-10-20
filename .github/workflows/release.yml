@@ -105,6 +105,12 @@ jobs:
           echo "Release notes extracted:"
           cat release_notes.md
 
+      - name: Generate SHA256SUMS for release assets
+        run: |
+          cd release
+          sha256sum sbom.json build_metadata.json > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -115,9 +121,11 @@ jobs:
           prerelease: false
           generate_release_notes: false
           # SBOM 与来源元数据随 Release 发布，便于下游按 digest 校验与审计
+          # §10.1：Release 资产须附 SHA256SUMS.txt（防传输损坏；防伪造由 Ed25519 签名承担）
           files: |
             release/sbom.json
             release/build_metadata.json
+            release/SHA256SUMS.txt
 
   # ── 桌面增量包（Windows）：打包 + Ed25519 签名 + 验签 + 壳静态检查 ──
   # 落地执行总结 §5-4：release.yml 扩展「构建壳 → 打包 app → 签名 → 分卷 → 上传」。
@@ -188,6 +196,17 @@ jobs:
       - name: Cargo check (desktop shell)
         working-directory: desktop/src-tauri
         run: cargo check --locked
+
+      - name: Generate SHA256SUMS for desktop assets
+        shell: bash
+        run: |
+          if ls release/packages/app-v*.zip >/dev/null 2>&1; then
+            cd release/packages
+            sha256sum app-v*.zip > SHA256SUMS.txt
+            cat SHA256SUMS.txt
+          else
+            echo "No desktop packages; skipping SHA256SUMS generation"
+          fi
 
       - name: Upload desktop release assets
         uses: softprops/action-gh-release@v2

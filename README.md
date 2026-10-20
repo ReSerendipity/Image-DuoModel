@@ -1,10 +1,10 @@
-# Image MultiModel
+# Image DuoModel
 
-![Version](https://img.shields.io/badge/version-1.2.2-blue?style=for-the-badge) ![License](https://img.shields.io/badge/license-Apache2.0-green?style=for-the-badge) ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white) ![GPU](https://img.shields.io/badge/GPU-NVIDIA%20CUDA-76B900?style=for-the-badge&logo=nvidia&logoColor=white) [![CI](https://github.com/ReSerendipity/Image-MultiModel/actions/workflows/ci.yml/badge.svg)](https://github.com/ReSerendipity/Image-MultiModel/actions) [![gitleaks](https://img.shields.io/badge/secret%20scan-gitleaks%20passing-0080FF?style=for-the-badge)](https://github.com/ReSerendipity/Image-MultiModel/actions/workflows/gitleaks.yml)
+![Version](https://img.shields.io/badge/version-1.2.2-blue?style=for-the-badge) ![License](https://img.shields.io/badge/license-Apache2.0-green?style=for-the-badge) ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white) ![GPU](https://img.shields.io/badge/GPU-NVIDIA%20CUDA-76B900?style=for-the-badge&logo=nvidia&logoColor=white) [![CI](https://github.com/ReSerendipity/Image-DuoModel/actions/workflows/ci.yml/badge.svg)](https://github.com/ReSerendipity/Image-DuoModel/actions) [![gitleaks](https://img.shields.io/badge/secret%20scan-gitleaks%20passing-0080FF?style=for-the-badge)](https://github.com/ReSerendipity/Image-DuoModel/actions/workflows/gitleaks.yml)
 
-**Image MultiModel — 多模型 AI 图像生成平台：基于进程内原生引擎，复用 ComfyUI 源码接入 Z-Image Turbo / Qwen-Image 2.1 Edit / Flux.2 Klein 的「单页 Web UI」**
+**Image DuoModel — 多模型 AI 图像生成平台：基于进程内原生引擎，复用 ComfyUI 源码接入 Z-Image Turbo / Qwen-Image 2.1 Edit / Flux.2 Klein 的「单页 Web UI」**
 
-> **Image MultiModel** — A unified AI image generation platform powered by an in-process native engine (reusing local ComfyUI source) that hosts multiple diffusion backends: Z-Image Turbo for fast txt2img, Qwen-Image 2.1 Edit for instruction-driven image editing, and Flux.2 Klein 9B for high-quality photoreal txt2img — all fully decoupled from any external ComfyUI process.
+> **Image DuoModel** — A unified AI image generation platform powered by an in-process native engine (reusing local ComfyUI source) that hosts multiple diffusion backends: Z-Image Turbo for fast txt2img, Qwen-Image 2.1 Edit for instruction-driven image editing, and Flux.2 Klein 9B for high-quality photoreal txt2img — all fully decoupled from any external ComfyUI process.
 
 ---
 
@@ -14,7 +14,7 @@
 
 *浅色主题 — 生图工作台主页 / 高级参数 / 预设管理 / 历史记录 / 图片展示 / 批量模式*
 
-> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image-duoModel/)。
+> 界面截图：主页、高级参数、预设管理、历史记录、图片展示、批量模式共六张，可在线查看 [生图工作台演示页](https://reserendipity.github.io/Image-DuoModel/)。
 
 ---
 
@@ -130,7 +130,7 @@ docker run --gpus all -p 8288:8288 \
 ## 项目结构
 
 ```
-Image-MultiModel/
+Image-DuoModel/
 ├── app/                          # 应用入口与主程序
 │   ├── clean_launch.py          # 启动清理 + 环境检测 + 启动 uvicorn
 │   └── integrated_app/          # 主应用核心
@@ -280,4 +280,4 @@ python -m pytest tests/e2e -m e2e
 
 > 🚧 **开发中**：Windows 桌面版正在开发，尚未正式发布。
 
-桌面版将提供安装器与自动更新；正式发布后可从 [GitHub Releases](https://github.com/ReSerendipity/Image-MultiModel/releases) 下载获取，届时在本节补充安装与使用说明。
+桌面版将提供安装器与自动更新；正式发布后可从 [GitHub Releases](https://github.com/ReSerendipity/Image-DuoModel/releases) 下载获取，届时在本节补充安装与使用说明。

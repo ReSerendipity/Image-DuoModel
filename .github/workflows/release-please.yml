@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   release-please:
@@ -41,3 +42,20 @@ jobs:
             echo "- release PR: `${PR:-（本次没有开）}`"
             echo "- tag: `${TAG:-无}`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # §10 资产链修复（2026-10-20）：release-please 用 GITHUB_TOKEN 经 API 建的 tag/Release
+      # 不触发下游 push/release 事件（GitHub 防递归规则），导致 release.yml 从未运行、资产为空。
+      # workflow_dispatch 是该规则下的例外，故在 release 创建后于同一 run 内显式 dispatch release.yml。
+      - name: 触发资产构建 release.yml（workflow_dispatch 例外路径）
+        if: ${{ steps.rp.outputs.release_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.rp.outputs.tag_name }}
+        run: |
+          set -eu
+          if [ -z "${TAG:-}" ]; then
+            echo "release_created=true 但 tag_name 为空，异常，退出"
+            exit 1
+          fi
+          gh workflow run release.yml --ref "$TAG" -f tag="$TAG"
+          echo "已触发 release.yml（ref=tag=$TAG）"

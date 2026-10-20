@@ -1,12 +1,12 @@
 ﻿; Image MultiModel 桌面版 NSIS 安装器
-; 用法：makensis /DVERSION=1.2.2 setup.nsi
+; 用法：makensis /DVERSION=2.0.0 setup.nsi
 ; 发布流程：setup.exe 与数据分卷（ImageMultiModel-Data.7z.001/.002/.003）同目录
 Unicode true
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
 
 !ifndef VERSION
-  !define VERSION "1.2.2"
+  !define VERSION "2.0.0"
 !endif
 
 Name "Image MultiModel 桌面版"

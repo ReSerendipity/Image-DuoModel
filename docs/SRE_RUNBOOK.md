@@ -2,7 +2,7 @@
 
 > **来源**：家族泛化自 TTS_MultiModel `docs/SRE_RUNBOOK.md`，本仓本地化。
 > 配套：`docs/rollback_sop.md`、`docs/release-governance.md`。
-> 适用版本：v1.2.2（与 `config.yaml` 顶层 `version` 一致）。
+> 适用版本：v2.0.0（与 `config.yaml` 顶层 `version` 一致）。
 
 ---
 

@@ -40,7 +40,7 @@ def test_system_health_returns_json_with_integrity(client):
     assert r.headers["content-type"].startswith("application/json")
     body = r.json()
     assert body["status"] == "ok"
-    assert body["version"] == "1.3.0"
+    assert body["version"] == "2.0.0"
     integrity = body["security"]["integrity"]
     assert set(integrity) >= {"checked", "failed", "failed_files", "manifest_signed"}
 

@@ -14,7 +14,7 @@
 ## 1. 版本号规范
 
 - 遵循 **SemVer** `MAJOR.MINOR.PATCH`；预发布用 `-alpha.N` / `-beta.N` / `-rc.N`（同 §10.2）。
-- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **1.3.0**，为该仓既有滞后值；当前**版本基线为 `v2.0.0`**，由 release-please 托管的 `version.txt` 承载，见下）。
+- **唯一权威版本位**：`config.yaml` 顶层 `version`（当前 **2.0.0**，与应用版本基线 `v2.0.0` 对齐；基线由 release-please 托管的 `version.txt` 承载，见下）。
 - 必须同步的其它版本位：
   - `CHANGELOG.md`（发版节标题 `[X.Y.Z] - YYYY-MM-DD`）
   - `AGENTS.md` 顶部「对应项目版本」（本地维护、不入库，见家族规范 §7）

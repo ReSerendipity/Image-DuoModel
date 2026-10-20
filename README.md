@@ -136,14 +136,14 @@ Image-DuoModel/
 │   └── integrated_app/          # 主应用核心
 │       ├── app_server.py        # FastAPI 应用 + 路由自动发现
 │       ├── native/              # 进程内原生引擎（source/executor/engine/diffusers_engine/seedvr/lora/compares/vram/preview）
-│       ├── routes/              # API 路由（config/engine/generate/governance/metrics/output/preprocess/preset/prompt/safety/system/task）
+│       ├── routes/              # API 路由（agent/config/engine/generate/governance/metrics/output/preprocess/preset/prompt/safety/system/task/train）
 │       ├── security/            # PathGuard 路径防护 + 完整性校验（integrity_manifest.json）
 │       ├── middleware/          # CSRF、限流、Request ID、安全头
 │       ├── locales/             # i18n 五语言 JSON（zh/zh-tw/en/ja/ko）
 │       ├── watermark.py         # DCT 频域不可感知数字水印
 │       └── history_db.py / task_queue.py / gpu_utils.py
 ├── comfy_kernel/                 # vendored ComfyUI 内核（gitignored，不随仓库分发，克隆后按 docs/GPL_COMPLIANCE.md 自行获取）
-├── workflows/                    # 工作流参考目录（gitignored，clean_launch 自动重建）
+├── workflows/                    # 工作流蓝图 blueprints/（随仓库分发）+ 用户自有工作流目录（clean_launch 启动时按需创建）
 ├── pretrained_models/            # 模型检查点存放（portable 模式，gitignored）
 ├── desktop/                      # 桌面分发：src-tauri（Tauri v2 壳）+ installer/setup.nsi（NSIS）
 ├── release/                      # 发布元数据（build_metadata.json、sbom.json）

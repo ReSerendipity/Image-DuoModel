@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "description": "引擎固定评估集（NEXT P1-4 定稿）：发版/换权重前对文生图引擎跑固定 prompt，产物 PNG + meta.json 归档，供质量回归与漂移对比。",
+  "seed": 42,
+  "defaults": {
+    "width": 1024,
+    "height": 1024,
+    "cfg": 1.0,
+    "steps": 8
+  },
+  "engines": [
+    "z_image_turbo_native",
+    "flux2_klein_native",
+    "krea2_turbo_native",
+    "flux1_dev_native",
+    "qwen_image_native"
+  ],
+  "prompts": [
+    {
+      "id": 1,
+      "name": "still-life-apple",
+      "prompt": "A still life photograph of a red apple on a wooden table, soft window light, shallow depth of field"
+    },
+    {
+      "id": 2,
+      "name": "misty-pine-forest",
+      "prompt": "Misty pine forest at dawn, volumetric light rays, cinematic wide shot"
+    },
+    {
+      "id": 3,
+      "name": "elderly-portrait",
+      "prompt": "Portrait of an elderly woman with silver hair, warm studio light, 85mm lens, photorealistic"
+    },
+    {
+      "id": 4,
+      "name": "rainy-neon-street",
+      "prompt": "Rainy neon city street at night, reflections on wet asphalt, cyberpunk atmosphere"
+    },
+    {
+      "id": 5,
+      "name": "cat-windowsill",
+      "prompt": "A ginger cat sitting on a windowsill, golden hour light, photorealistic"
+    },
+    {
+      "id": 6,
+      "name": "concrete-olive",
+      "prompt": "Minimalist white concrete architecture with a single olive tree, noon shadow, architectural photography"
+    },
+    {
+      "id": 7,
+      "name": "breakfast-overhead",
+      "prompt": "Overhead shot of a rustic breakfast with croissant, coffee and fresh fruit, food photography"
+    },
+    {
+      "id": 8,
+      "name": "ink-in-water",
+      "prompt": "Abstract flowing ink in water, dark background, high contrast macro photography"
+    },
+    {
+      "id": 9,
+      "name": "astronaut-desert",
+      "prompt": "A lone astronaut standing on a desert planet with two moons, cinematic sci-fi scene"
+    },
+    {
+      "id": 10,
+      "name": "keyboard-product",
+      "prompt": "A sleek matte black mechanical keyboard with warm backlight, product shot, clean studio background"
+    }
+  ]
+}

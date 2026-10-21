@@ -130,7 +130,7 @@ $rxRepo = [regex]'(?i)(?:https?://)?(?:www\.)?((?:github|gitee|gitlab)\.com|gitc
 
 ## 9. 入库输出规范
 
-追加进目标清单文档（本仓为 `docs/project/桌面宠物开源仓库清单.md`），沿用其既有表头，逐列给全：
+追加进目标清单文档（本仓示例为 `docs/project/桌面宠物开源仓库清单.md`；**注意：该文件在本仓当前不存在**——`docs/project/` 下仅 `AI_DEV_SOPS.md` 被 git 跟踪），沿用其既有表头，逐列给全：
 
 ```
 | 项目仓库 | 体量/栈 | 一句话介绍 | 来源视频 (BV号) | UP 主 | 发布日 | 提取位置 |
@@ -143,7 +143,7 @@ $rxRepo = [regex]'(?i)(?:https?://)?(?:www\.)?((?:github|gitee|gitlab)\.com|gitc
 
 ### 入库前必查：目标文档的 Git 跟踪状态
 
-清单类文档常落在被忽略的目录（本仓 `.gitignore` 有 `docs/project/*`，仅对少数文件用 `!` 开白名单）。写之前先确认：
+清单类文档常落在被忽略的目录（**本仓 `.gitignore` 当前没有 `docs/project/*` 规则**，`docs/project/` 下唯一被跟踪的文件是 `AI_DEV_SOPS.md`；若他仓模板假定该忽略规则存在，以本仓实测为准）。写之前先确认：
 
 ```bash
 git ls-files -- docs/project/<清单文件>.md   # 空 = 未被跟踪

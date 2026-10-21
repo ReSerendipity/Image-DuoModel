@@ -1,7 +1,7 @@
 # 完成定义（Definition of Done）
 
 > **来源**：家族通用 DOD 模板 `.spec_audit/family_DOD.md`（源自 SpiritPal definition-of-done.md 泛化；该家族模板已归档，2026-09-17 起按本仓本地化内容维护），本仓本地化。
-> **适用范围**：Image_MultiModel 全项目所有功能开发任务。
+> **适用范围**：Image-DuoModel 全项目所有功能开发任务。
 
 ---
 
@@ -20,9 +20,9 @@
 - [ ] 功能已实现，覆盖 PRD / Spec 定义的所有验收标准（AC）
 - [ ] `ruff` / `ruff-format` 通过（0 error；`pyproject.toml` line-length=120）
 - [ ] 无调试残留（`print()` / `breakpoint()` / `pdb`，诊断日志除外需标记）
-- [ ] 未引入跨层违规引用（遵守 AGENTS.md §2.3 分层约束 + §3 禁区表）
+- [ ] 未引入跨层违规引用（遵守根 `AGENTS.md`「🚫 禁区目录」段与公开约束 `docs/AGENT_CONSTRAINTS.md` C-2 / C-3）
 - [ ] 新增路由定义了模块级 `router`（`pkgutil` 自动发现）
-- [ ] 新增功能已按 AGENTS.md §9 SOP 完成
+- [ ] 新增功能已按 SOP 完成（`docs/SOPS.md`；更细的本地 SOP 见 `docs/agents/SOPS.md`）
 
 ## 2. 测试覆盖
 
@@ -34,8 +34,8 @@
 ## 3. 文档同步
 
 - [ ] `AGENTS.md` 已同步（目录结构 / 模块地图 / 版本号 / 配置 / i18n）
-- [ ] 新增模块在 AGENTS.md §3.1 有对应条目
-- [ ] 踩坑已追加到 AGENTS.md §8 Known Gotchas（触发/现象/做法/日期）
+- [ ] 新增模块在 `docs/agents/ARCH_MAP.md`（目录地图）有对应条目
+- [ ] 踩坑已追加到 `local/agents/GOTCHAS.md`（触发/现象/做法/日期；根 `AGENTS.md` 铁律 #2）
 - [ ] `CHANGELOG.md` 已记录变更（type 对应 Added/Fixed/…）
 - [ ] `python scripts/check_spec_refs.py` 退出码 0（无幻影/死链/假门禁）
 

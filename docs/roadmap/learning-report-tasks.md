@@ -39,7 +39,7 @@
 ### 机制建设（T-31~T-34）
 
 - T-31 「学习报告→开发任务挂钩机制」：本文档即为其落地形式，**视为已完成**；
-- T-32/T-33/T-34 分别对应 CI 门禁、文档模板、评审 checklist，与 `docs/QUALITY_CONTRACT.md` / `.githooks/` 有耦合，可拆为独立 chore 类 PR；
+- T-32/T-33/T-34 分别对应 CI 门禁、文档模板、评审 checklist，与 `docs/agents/QUALITY_CONTRACT.md` / `.githooks/` 有耦合，可拆为独立 chore 类 PR；
 
 ### 路线图决策（T-35~T-38）
 

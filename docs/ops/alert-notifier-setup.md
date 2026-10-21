@@ -39,13 +39,17 @@ alerts.set_notifier(webhook_notifier)
 
 ## 现有告警阈值（来自 alerts.py）
 
+`app/integrated_app/observability/alerts.py` 的 `AlertEngine._make_rules()` 共 **7 条**规则，阈值与 Runbook 一一对应（Runbook 路径亦由该文件的 `_RUNBOOK` 映射给出）：
+
 | 告警 | 阈值 | 级别 | Runbook |
 |---|---|---|---|
 | 服务不健康 | ≥2 次连续 health 失败 | critical | docs/runbooks/service_startup.md |
-| 生成失败率 | >5% 持续 5min | critical | docs/runbooks/generation_failure.md |
-| 队列填充 | ≥85% 持续 5min | warning | docs/runbooks/queue_backlog.md |
+| 生成失败率 | >5% 持续 5min | critical | docs/runbooks/generation_failures.md |
+| 队列填充 | ≥85% 持续 5min | warning | docs/runbooks/queue_overload.md |
 | GPU 可用显存 | <15% 持续 2min | critical | docs/runbooks/gpu_oom.md |
 | 磁盘可用 | <15% | critical | docs/runbooks/disk_full.md |
+| LLM Token 日预算 | 当日累计超 `finops.budget_llm_tokens_per_day` | warning | docs/runbooks/llm_token_budget.md |
+| 崩溃留痕 | 24h 内新增 `logs/crash_reports/crash-*.log` | warning | docs/runbooks/crash_reports.md |
 
 ## 部署门禁建议
 

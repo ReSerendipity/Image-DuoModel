@@ -12,6 +12,8 @@
 | 3 | QueueOverloaded | warning | 队列填充率 ≥ 85% | 300s | 填充率 < 85% | docs/runbooks/queue_overload.md |
 | 4 | GpuVramLow | critical | GPU 可用显存 < 15% | 120s | ≥15% | docs/runbooks/gpu_oom.md |
 | 5 | DiskSpaceLow | critical | 磁盘可用 < 15% | 立即 | ≥15% | docs/runbooks/disk_full.md |
+| 6 | LLMTokenBudgetExceeded | warning | LLM 当日 Token 用量超 `finops.budget_llm_tokens_per_day` | 立即 | 当日用量回落至预算内 / 次日重置 | docs/runbooks/llm_token_budget.md |
+| 7 | CrashReportsDetected | warning | 24h 内新增崩溃留痕（`crash_reports_recent` > 0） | 立即 | 24h 窗口内无新留痕 | docs/runbooks/crash_reports.md |
 
 ## 阈值依据
 

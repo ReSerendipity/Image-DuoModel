@@ -1,7 +1,7 @@
-# Image MultiModel 用户协议（User Agreement）
+# Image-DuoModel 用户协议（User Agreement）
 
 **版本**：v1.0 ｜ **生效日期**：2026-09-02
-**适用范围**：Image_MultiModel 开源代码及一切分发形态的使用者
+**适用范围**：Image-DuoModel 开源代码及一切分发形态的使用者
 
 ## 1. 许可与发布形态
 

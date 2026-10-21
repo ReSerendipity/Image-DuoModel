@@ -17,7 +17,7 @@
 - [ ] **出图基线**：在 `docs/reports/engine_baseline/<new_engine>/` 下存 3 张样图
       （人物 / 风景 / 复杂构图）+ `meta.json`（weight_sha256、precision、日期、人评）。
 - [ ] **GOTCHAS 记录**：接入过程踩的坑（键前缀 / 量化描述符 / 双 TE / latent_channels 等）
-      追加到 `docs/agents/GOTCHAS.md`。
+      追加到 `local/agents/GOTCHAS.md`。
 - [ ] **README 功能表**：若引擎面向用户，在 `README.md` 功能亮点表加一行。
 - [ ] **CHANGELOG**：`CHANGELOG.md` Unreleased 节 Added 段记一条。
 

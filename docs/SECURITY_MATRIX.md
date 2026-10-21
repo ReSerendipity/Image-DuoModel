@@ -1,4 +1,4 @@
-﻿# Image_MultiModel 安全矩阵
+﻿# Image-DuoModel 安全矩阵
 
 > 本文档列出项目的安全控制措施，供安全审计和合规检查参考。
 
@@ -6,7 +6,7 @@
 
 | 控制项 | 实现方式 | 状态 |
 |---|---|---|
-| 分支保护 | GitHub Branch Protection（main 受保护，需 PR + required checks） | ✅ |
+| 分支保护 | GitHub Branch Protection（main 需 required checks；仓库所有者 admin 已开**直推豁免**，非 admin 仍需 PR + 1 审批） | ✅ |
 | DCO 签名 | .githooks/commit-msg 强制 Signed-off-by | ✅ |
 | 代码审查 | PR 需 review | ⚠️ 待配置 CODEOWNERS |
 
@@ -32,7 +32,7 @@
 
 | 控制项 | 实现方式 | 状态 |
 |---|---|---|
-| 签名发布 | gpg-signed-release（仅 SeedVR2） | ⚠️ 待推广 |
+| 签名发布 | Ed25519 清单/增量包签名（`scripts/sign_integrity_manifest.py` + `.github/workflows/release.yml` 的 Verify package Ed25519 signature 步骤） | ✅ |
 | 制品不可变 | Immutable Release Artifacts | ✅ |
 
 ---

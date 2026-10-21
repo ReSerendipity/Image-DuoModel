@@ -1,11 +1,11 @@
 # Third-Party Notices（第三方组件声明）
 
-> 更新日期：2026-09-02。本清单非穷尽：完整依赖以 `requirements.txt` / `requirements-lock.txt`
+> 更新日期：2026-10-21。本清单非穷尽：完整依赖以 `requirements.txt` / `requirements-lock.txt`
 > 及安装环境的 `pip freeze` 为准；各组件许可以其官方仓库与包内 LICENSE 为准。
 
 ## 项目主许可
 
-Image MultiModel 项目代码采用 [Apache License 2.0](../LICENSE)。
+Image-DuoModel 项目代码采用 [Apache License 2.0](../LICENSE)。
 
 ## 核心推理引擎
 
@@ -15,11 +15,11 @@ Image MultiModel 项目代码采用 [Apache License 2.0](../LICENSE)。
 - **引擎 key**：`config.yaml → models.engines.z_image_turbo_native`（`backend: native`）
 - **上游**：<https://github.com/Comfy-Org/ComfyUI>（Comfy-Org）
 - **许可（核心合规点）**：vendored `comfy_kernel/` 为 [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html)
-- **分发义务**：分发本项目需遵守 GPL-3.0（随附许可文本、提供源码获取方式、保留版权声明）；`comfy_kernel/` 作为独立 git 仓库由 `.gitignore` 排除，使用前需满足其许可要求。**源码获取方式与分发前自查清单见 `docs/GPL_COMPLIANCE.md`**（vendored 版本 0.32.0，源码对应提交 `9883be7c`）
+- **分发义务**：分发本项目需遵守 GPL-3.0（随附许可文本、提供源码获取方式、保留版权声明）；`comfy_kernel/` 作为独立 git 仓库由 `.gitignore` 排除，使用前需满足其许可要求。**源码获取方式与分发前自查清单见 `docs/GPL_COMPLIANCE.md`**（vendored 版本 0.38.0，源码对应提交 `6b747c04`）
 
 ### Z-Image-Turbo 模型权重（Apache-2.0）
 
-- **组件**：Z-Image-Turbo 模型权重（用户自行下载并放置于 `model/` 目录）
+- **组件**：Z-Image-Turbo 模型权重（用户自行下载并放置于权重目录 `pretrained_models/`，即 `config.yaml → models.portable.internal_models_dir`）
 - **上游**：<https://huggingface.co/Tongyi-MAI/Z-Image-Turbo>（通义实验室）
 - **许可**：[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)；再分发需保留原版权声明
 

@@ -1,4 +1,4 @@
-# TODO — Image-MultiModel 训练链路（P3 LoRA Training）
+# TODO — Image-DuoModel 训练链路（P3 LoRA Training）
 
 > 生成于 2026-10-03。记录 T-12 ~ T-14 收尾护栏（preflight）完成后的剩余工作与阻塞项。
 > 标记约定：🟢 已完成 / 🔴 阻塞（待环境） / ⬜ 未启动 / 🧹 已清理。

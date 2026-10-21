@@ -1,6 +1,6 @@
 # 本地形态告警落地方案（设计稿）
 
-> 来源：运维稳定性评估路线图 #8。上游定义：[alert_rules.md](alert_rules.md)（5 类规则，
+> 来源：运维稳定性评估路线图 #8。上游定义：[alert_rules.md](alert_rules.md)（7 类规则，
 > 代码为单一事实源）、[oncall.md](oncall.md)（其 Primary/Secondary 轮值模型面向团队形态，
 > **本项目当前为单人单机自托管**，本文给出与之匹配的送达设计）。
 > 状态：**设计稿（未实现）**；落地时按 §3 最小实现起步。
@@ -33,7 +33,7 @@
    - 弹 Windows Toast：PowerShell `Windows.UI.Notifications` 原生调用即可，
      **无需安装 BurntToast 等第三方模块**（保持便携模式零依赖原则）；
    - 崩溃自愈：由任务计划程序（登录时启动 + 失败重启）托管，与守护服务同生命周期。
-2. **映射**：5 类规则全部接入；`warning`（QueueOverloaded）默认只记日志不弹窗，
+2. **映射**：7 类规则全部接入；`warning`（QueueOverloaded）默认只记日志不弹窗，
    避免疲劳（与 alert_rules.md 去重疲劳设计一致）。
 3. **静默窗口**：允许 `IMM_TOAST_QUIET=HH:MM-HH:MM` 配置夜间静默
    （critical 仍弹，与 oncall.md 的夜间首响目标对齐）。

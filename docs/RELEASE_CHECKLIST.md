@@ -6,7 +6,7 @@
 ## 1. GPL-3.0（comfy_kernel / comfy-aimdo）——分发即触发
 
 - [ ] 包内随附 GPL-3.0 许可全文（`docs/GPL_COMPLIANCE.md` §2 清单）；
-- [ ] comfy_kernel 对应源码可获取：GitHub 上游链接 + vendored commit pin（`9883be7c`）随包说明；
+- [ ] comfy_kernel 对应源码可获取：GitHub 上游链接 + vendored commit pin（`6b747c04`，= 上游 `v0.38.0`）随包说明；
 - [ ] 保留上游版权声明（Comfy-Org 等）；
 - [ ] `docs/GPL_COMPLIANCE.md` §2 分发前自查清单全部勾选。
 
@@ -22,9 +22,9 @@
 - [ ] DCT 隐式水印开启且失败侧车策略生效（`config.watermark`）；
 - [ ] 首启协议确认弹窗可用（`image_mm:agreement:v1`）。
 
-## 4. 法务文件四件套随包
+## 4. 法务文件随包
 
-- [ ] LICENSE / NOTICE / USER_AGREEMENT.md / PRIVACY_POLICY.md / THIRD_PARTY_NOTICES.md 在包内（package_app ROOT_EXTRA 自动带上）。
+- [ ] LICENSE / NOTICE / SECURITY.md / USER_AGREEMENT.md / PRIVACY_POLICY.md / THIRD_PARTY_NOTICES.md 在包内（`scripts/package_app.py` 的 `ROOT_EXTRA` 自动带上）。
 
 ## 5. 待办（人工/后续版本）
 

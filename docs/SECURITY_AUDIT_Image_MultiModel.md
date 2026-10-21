@@ -1,4 +1,4 @@
-# 安全审计 — Image_MultiModel
+# 安全审计 — Image-DuoModel
 
 > 只读审计 · 快照版 · 审计日期：2026-09-02
 > 审计对象：FastAPI + 图像生成平台（默认引擎 `z_image_turbo_native`，backend: native，进程内复用 vendored `comfy_kernel/`）

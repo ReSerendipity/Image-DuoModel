@@ -25,12 +25,14 @@ idle 槽 (imm-green)   内部 :8289    ── 新版本先在此起服 + 独立�
 | 2 | idle 健康检查 + **只读 smoke**（health/config/engines/metrics/sse，不提交生成任务避免显存竞争） | 停 idle，线上不变 |
 | 3 | promote：记 `LAST_GOOD=旧tag` → 停 idle → 停 active → active 以新 tag 重启 | 健康失败 → **自动回滚** |
 | 4 | 完整 smoke（含假生成任务） | 失败 → **自动回滚** |
-| 5 | 观察窗口（默认 120s）：轮询 `/api/alerts`，出现 P1 firing（ServiceUnhealthy / GPUOOM / QueueOverload / GenerationFailuresHigh）即失败 | 失败 → **自动回滚** |
+| 5 | 观察窗口（默认 120s）：轮询 `/api/alerts`，出现 P1 firing（ServiceUnhealthy / GpuVramLow / QueueOverloaded / GenerationFailureRateHigh / DiskSpaceLow）即失败 | 失败 → **自动回滚** |
 | 6 | 写入 HISTORY，promote 成功 | |
 
-**晋级/回退条件**（报告 §9-P2-12）：错误率与生成成功率由完整 smoke 的假任务 + `GenerationFailuresHigh`
-告警覆盖；OOM 由 `GPUOOM`/`gpu_oom_total` 覆盖；P99 超预算由 P2 `P99LatencyHigh` 告警在观察窗口中暴露
-（P1 firing 为硬阻断）。
+**晋级/回退条件**（报告 §9-P2-12）：错误率与生成成功率由完整 smoke 的假任务 + `GenerationFailureRateHigh`
+告警覆盖；OOM / 显存不足由 `GpuVramLow`（+ `gpu_oom_total` 指标）覆盖。
+观察窗口的判定集合即 `scripts/deploy/bluegreen.sh` 的 `KEY` 变量：`ServiceUnhealthy` /
+`GenerationFailureRateHigh` / `QueueOverloaded` / `GpuVramLow` / `DiskSpaceLow`（P1 firing 为硬阻断）。
+延迟类指标（P99）**不在**该集合内——告警引擎当前没有延迟规则。
 
 ## 3. 一键回滚
 

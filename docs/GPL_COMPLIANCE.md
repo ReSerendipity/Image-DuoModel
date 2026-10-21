@@ -10,15 +10,17 @@
 |---|---|
 | 组件 | `comfy_kernel/` — vendored ComfyUI 内核源码 |
 | 上游 | <https://github.com/comfyanonymous/ComfyUI> |
-| 版本 | ComfyUI 0.32.0（`comfy_kernel/pyproject.toml`） |
-| 上游基线提交 | `bd34f338`（2026-08-12，v0.32.0 + 5 commits，`comfy_kernel/UPGRADE_STRATEGY.md` 的 Current Commit，可在上游仓库查得） |
-| 本地内核仓 HEAD | `9883be7c5ec4082a090347d461bb0bd4131516f5`（2026-08-17，**本地新增的管理提交**，不在上游，其父链即完整上游历史共 5755 个提交） |
+| 版本 | ComfyUI 0.38.0（`comfy_kernel/pyproject.toml`） |
+| 上游基线提交 | `6b747c04`（2026-09-29，上游 tag `v0.38.0`） |
+| 本地内核仓 HEAD | `6b747c0428c343e1417219641db93a4fb7cb69ae`（2026-09-29，与上游 `v0.38.0` 同一提交；上游历史共 6042 个提交） |
 | 许可 | GNU GPL-3.0（`comfy_kernel/LICENSE`） |
 | 主项目许可 | Apache-2.0（`LICENSE`） |
 | 引用方式 | 进程内复用（native 引擎 `comfy_source_dir: comfy_kernel`），非独立进程/网络调用 |
 
-> ⚠️ **语义澄清**：`9883be7c` 是内核本地 git 仓库的 HEAD（含本地维护提交），**不是**上游提交——
-> 拿去上游仓库按此哈希查询会得到 `No commit found`。可追溯的上游提交是 `bd34f338`。
+> ⚠️ **语义澄清**：当前本地内核仓 HEAD `6b747c04` **就是**上游 `v0.38.0` 的提交
+> （`git rev-parse v0.38.0^{commit}` 与 `git rev-parse HEAD` 同值），故该哈希可直接在上游仓库查得。
+> 若日后在本地追加内核维护提交，HEAD 将不再等于上游提交，届时「上游基线提交」与「本地内核仓 HEAD」
+> 会分叉（例如 2026-08 阶段的本地管理提交 `9883be7c`），拿去上游查询会得到 `No commit found`。
 > 二者在升级/重放内核时都可能变化，§4 要求两行同步更新。
 
 ## 2. 「提供对应源码」的两种履行方式（分发者二选一）

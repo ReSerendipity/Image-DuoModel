@@ -14,7 +14,7 @@
 | `build_postprocess_matrix()` | `1024px_b1_seedvr2_on` / `1024px_b1_seedvr2_off` | SeedVR2 后处理开关 |
 | `build_postprocess_matrix()` | `1024px_b1_lora1`（**仅当** `model/loras/` 下存在权重时自动加入） | LoRA |
 
-- **引擎维度**：当前版本仅单一引擎 `z_image_turbo_native`（AGENTS.md §1），矩阵中所有 profile 固定该引擎。新增引擎时只需扩展 `build_matrix()` 的 `engine_name` 循环。
+- **引擎维度**：矩阵中的 profile 固定使用 `z_image_turbo_native`（`scripts/capacity_baseline.py` 的 `engine_name` 硬编码），**不代表本仓仅注册了这一个引擎**——`config.yaml` 当前注册 7 个引擎（`config.yaml → models.engines`）。基线只覆盖 Z-Image Turbo 这一档，其余引擎尚无容量基线。新增引擎基线时需扩展 `build_matrix()` 的 `engine_name` 循环。
 - **LoRA 维度**：`discover_lora_names()` 扫描 `model/loras/*.{safetensors,ckpt,pt,bin}`，无权重时自动跳过该 profile（避免基线因缺权重而误报失败）。
 
 ## 2. 采集指标

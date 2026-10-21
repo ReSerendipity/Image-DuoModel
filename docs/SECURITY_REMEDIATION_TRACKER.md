@@ -1,4 +1,4 @@
-# Image MultiModel v2.0.0 — 安全评估整改追踪表
+# Image-DuoModel v2.0.0 — 安全评估整改追踪表
 
 > 配套评估：原 `docs/_devarchive/SECURITY_ASSESSMENT_v2.0.0.md`（17 项发现 + 三阶段路线图）**原件已佚失**（本地文件未入 git，2026-09-15 全盘搜索确认不存在）；17 项发现的整改结论保留于本表，评估细节可参照 `docs/SECURITY_AUDIT_Image_MultiModel.md` 与 git 历史。
 > 整改日期：2026-09-01（基于 2026-08-31 评估快照）
@@ -9,7 +9,7 @@
 安全评估结论：**真正的风险不是单点漏洞，而是「配置-实现不一致不报错」**——
 `verify_weights: true`、`basic_auth`、`server.ssl` 等声明了却没人读，且不报错、不告警、测试也不失败。
 
-对应评估路线图第三阶段 #13，已落地为 **配置-实现一致性门禁** `scripts/check_config_refs.py`（接入 `.github/workflows/ci.yml:304`）：
+对应评估路线图第三阶段 #13，已落地为 **配置-实现一致性门禁** `scripts/check_config_refs.py`（接入 `.github/workflows/ci.yml` 的 `Config Field Refs Integrity (P0-1)` job，其中 `Check config field references` 步骤当前在 L544-545）：
 
 - 校验 `config.yaml` 的 `security:` 段每个键都被代码真实消费（声明即生效，否则 CI fail）；
 - 校验 `config.yaml` 的 `runtime:` 段每个键都在 `RuntimeConfig` 中定义（防 idle_unload_minutes 式启动阻断回归）；
@@ -32,7 +32,7 @@
 | **M-03** | A05 | 上传无大小限制 | `routes/preprocess_routes.py:79` 消费 `max_size_mb` + `max_pixels` | ✅ 已修 | `test_generate_routes.py` |
 | **M-04** | A08 | `custom_nodes_dir` 注入 sys.path | `native/source.py:54-59` 用 `PathGuard` 校验目录落于项目根内 | ✅ 已修（comfy_kernel vendored 哈希基线为可选加固，未做） | `test_native_kernel_security.py` |
 | **M-05** | A06 | 供应链：盲装 pip / 硬编码外部解释器 | `clean_launch.py` 不再盲 `pip install`（改提示），外部解释器改由 `PROJECT_ROOT.glob("WPy64-*")` / 环境变量解析 | ✅ 已修 | `test_clean_launch_security.py` |
-| **M-06** | A03 | 前端 3 处 XSS | `app/static/js/app.js:183/420` 改用 `escHtml()`；`r.detail` 走 `alert()` 安全回显 | ✅ 已修 | `tests/frontend/` |
+| **M-06** | A03 | 前端 3 处 XSS | `app/integrated_app/static/js/app.js:183/420` 改用 `escHtml()`；`r.detail` 走 `alert()` 安全回显 | ✅ 已修 | `tests/frontend/` |
 | **M-07** | A05 | `check-image` 可读 `model/` | `config_models.py:359-365` 新增独立 `image_read_base_dirs`；`safety_routes.py:82-84` 优先使用 | ✅ 已修 | `test_security_audit.py` |
 | **L-01** | A09 | 完整性自检 `skipped>0` 仍打「通过」 | `integrity_selfcheck.py` 改为 `skipped>0` 显式 WARNING（消除「假通过」） | ✅ 已修 | `test_security_audit.py` |
 | **L-02** | A04 | 无密钥时水印未签名可伪造 | 本地优先场景残余风险低；生产部署建议将 `IMAGE_MULTIMODEL_WATERMARK_KEY` 设为启动必需项 | ⚪ 可选（文档建议） | — |

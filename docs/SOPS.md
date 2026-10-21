@@ -19,9 +19,13 @@
 ```
 验签失败自动回退 HMAC；发布门禁 gate-4 已固化三步。
 
-## 2. 水印密钥
-- `data/.imm_secret`：本机水印 HMAC 密钥（gitignored），权限自愈 0600/icacls；由 `app/integrated_app/security/secret_key.py::get_secret_key()` 管理。
+## 2. 服务端 HMAC 回退密钥
+- `data/.imm_secret`：完整性清单的 **HMAC-SHA256 回退签名**密钥（gitignored），权限自愈 0600/icacls；
+  由 `app/integrated_app/security/secret_key.py::get_secret_key()` 管理。无 Ed25519 私钥/公钥时用它签
+  `integrity_manifest.json` 的 `.sig`（见 `integrity_selfcheck.py`）。
 - 恢复：删除后下次启动自动重建（无恢复负担）。
+- 注：**水印**签名密钥是另一个文件——项目根 `.watermark_key`（或环境变量注入），
+  由 `app/integrated_app/watermark.py` 与 `scripts/init_watermark_key.py` 管理，勿与本节混淆。
 
 ## 3. Tauri 更新签名（桌面壳增量更新）
 

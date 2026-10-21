@@ -60,8 +60,8 @@ jobs:
             --build-arg IMAGE_TAG=${{ steps.meta.outputs.image_tag }} \
             --build-arg GIT_SHA=${{ github.sha }} \
             --build-arg BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            -t image-multimodel:${{ steps.meta.outputs.image_tag }} \
-            -t image-multimodel:${{ github.sha }} \
+            -t image-duomodel:${{ steps.meta.outputs.image_tag }} \
+            -t image-duomodel:${{ github.sha }} \
             .
 
       - name: Pin image digest
@@ -69,7 +69,7 @@ jobs:
         run: |
           # 本地构建的 digest 通过 docker inspect 取得；推送到 registry 后应改用
           # `docker buildx imagetools inspect` 重取并回写 .env，确保部署按 digest 固化。
-          DIGEST=$(docker inspect --format='{{index .Id}}' image-multimodel:${{ steps.meta.outputs.image_tag }})
+          DIGEST=$(docker inspect --format='{{index .Id}}' image-duomodel:${{ steps.meta.outputs.image_tag }})
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
           python scripts/build_release_metadata.py \
             --version "${{ steps.version.outputs.tag }}" --digest "$DIGEST"

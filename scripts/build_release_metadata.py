@@ -315,9 +315,9 @@ def build_sbom(requirements_text: str, image_tag: str, git_sha_value: str) -> di
             "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
             "component": {
                 "type": "application",
-                "name": "image-multimodel",
+                "name": "image-duomodel",
                 "version": image_tag,
-                "bom-ref": "image-multimodel",
+                "bom-ref": "image-duomodel",
             },
             "properties": [
                 {"name": "git.sha", "value": git_sha_value or "unknown"},

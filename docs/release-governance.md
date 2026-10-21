@@ -44,7 +44,7 @@
 
 | 产物 | 构建位置 | 标签 / 命名 | 完整性手段 |
 |---|---|---|---|
-| 容器镜像 `image-multimodel:<tag>` | 远端（release.yml / deploy.yml，ubuntu-latest） | 不可变 semver（`build_metadata.json` 产出的 image_tag）+ git sha | SBOM（`release/sbom.json`）+ build metadata；**推 ghcr.io 待定（负责人 + 触发条件：阶段 B 评估 registry 迁移）** |
+| 容器镜像 `image-duomodel:<tag>` | 远端（release.yml / deploy.yml，ubuntu-latest） | 不可变 semver（`build_metadata.json` 产出的 image_tag）+ git sha | SBOM（`release/sbom.json`）+ build metadata；**推 ghcr.io 待定（负责人 + 触发条件：阶段 B 评估 registry 迁移）** |
 | SBOM + 构建元数据 | 远端（release.yml） | `release/sbom.json`、`release/build_metadata.json` | 随 Release 资产发布 |
 | 桌面增量包（Windows） | 远端（release.yml `desktop-package`，windows-latest） | `release/packages/app-v<X.Y.Z>.zip` | **Ed25519 签名**（`MANIFEST_SIGNING_KEY_B64` Secrets 注入，`verify_manifest_signature_ed25519` 验签） |
 | 便携包（Windows 全量） | **当前本机**（`scripts/pack_portable.ps1`），与远端优先目标态有差距 | 待定（负责人 + 触发条件：阶段 B 评估迁 Windows runner 远端构建） | 随打包流程补 `SHA256SUMS.txt` |
@@ -99,3 +99,15 @@
 - [ ] 引擎 / 权重改动时 `scripts/check_config_refs.py` 对账通过
 - [ ] **本地未产出任何发布交付物**（全部远端构建，同 §0）
 - [ ] tag 已推送
+
+## 9. 镜像名变更记录
+
+- **变更日期**：2026-10-21
+- **旧名**：`image-multimodel`
+- **新名**：`image-duomodel`（与仓名 `Image-DuoModel` 对齐，全小写连字符）
+- **影响范围**：`docker-compose*.yml`、`.github/workflows/{deploy,release,security}.yml`、`scripts/build_release_metadata.py`、`docs/ops/release_artifacts.md`、`README.md`、本文件
+- **GHCR 包处置**：
+  - 历史 GHCR 包（`ghcr.io/.../image-multimodel:*`）**保留不删除**，可继续按旧 digest 拉取
+  - 首次以新名 `image-duomodel` 发布时会在 GHCR 生成新包，旧包 tag 不迁移
+  - 生产部署通过 `IMAGE_DIGEST` 固定 digest，镜像名变更不影响按 digest 拉取的稳定性
+- **未改**：`app/integrated_app/mcp_server.py` 的 `MCP_SERVER_NAME` 常量（MCP 协议逻辑名，非 Docker 镜像名，改它可能影响 MCP 客户端连接，另行决策）

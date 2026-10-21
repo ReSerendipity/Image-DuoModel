@@ -22,7 +22,7 @@
 - [ ] 无调试残留（`print()` / `breakpoint()` / `pdb`，诊断日志除外需标记）
 - [ ] 未引入跨层违规引用（遵守根 `AGENTS.md`「🚫 禁区目录」段与公开约束 `docs/AGENT_CONSTRAINTS.md` C-2 / C-3）
 - [ ] 新增路由定义了模块级 `router`（`pkgutil` 自动发现）
-- [ ] 新增功能已按 SOP 完成（`docs/SOPS.md`；更细的本地 SOP 见 `docs/agents/SOPS.md`）
+- [ ] 新增功能已按 SOP 完成（`docs/SOPS.md`；更细的本地 SOP 见 `local/agents/SOPS.md`）
 
 ## 2. 测试覆盖
 
@@ -34,7 +34,7 @@
 ## 3. 文档同步
 
 - [ ] `AGENTS.md` 已同步（目录结构 / 模块地图 / 版本号 / 配置 / i18n）
-- [ ] 新增模块在 `docs/agents/ARCH_MAP.md`（目录地图）有对应条目
+- [ ] 新增模块在 `local/agents/ARCH_MAP.md`（目录地图）有对应条目
 - [ ] 踩坑已追加到 `local/agents/GOTCHAS.md`（触发/现象/做法/日期；根 `AGENTS.md` 铁律 #2）
 - [ ] `CHANGELOG.md` 已记录变更（type 对应 Added/Fixed/…）
 - [ ] `python scripts/check_spec_refs.py` 退出码 0（无幻影/死链/假门禁）

@@ -23,7 +23,7 @@
 | 特性 | 说明 |
 |---|---|
 | **原生进程内引擎** | 复用项目内 `comfy_kernel` 源码 + aki-v3 自定义节点，`sys.path` 注入后在同一进程内完成 加载→编码→采样→解码，**完全脱离外部 ComfyUI 进程** |
-| **多引擎接入** | `config.yaml → models.engines.*` 声明式注册，同一 `NativeEngine` 框架下现内置 3 个引擎：`z_image_turbo_native`（默认）/ `qwen_image_edit_native`（编辑）/ `flux2_klein_native`（高质量），新引擎接入步骤见 `docs/roadmap/P2-multi-engine.md` |
+| **多引擎接入** | `config.yaml → models.engines.*` 声明式注册，同一 `NativeEngine` 框架下现内置 **7 个引擎**（3 核心常用 + 4 进阶实验性）：核心 `z_image_turbo_native`（默认）/ `qwen_image_edit_native`（编辑）/ `flux2_klein_native`（高质量）；进阶 `qwen3_vl_8b_native`（VLM 看图）/ `qwen_image_native`（Qwen 文生图）/ `krea2_turbo_native` / `flux1_dev_native`，新引擎接入步骤见 `docs/roadmap/P2-multi-engine.md` |
 | **Z-Image Turbo 工作流** | 内置 Z Image Turbo（阿里通义）高速文生图工作流，支持六层 LoRA 叠加、SeedVR2 超分、Eses 双图对比、显存预留 |
 | **Qwen-Image 2.1 Edit** | 指令化图像编辑（支持参考图与透明图），需 Qwen Research License 授权方可商用（本项目默认非商用） |
 | **显存预检** | 推理前自动估算 VRAM 需求，推荐精度（FP8/FP16）与 batch chunk 大小 |
@@ -96,11 +96,11 @@
 ### Docker
 
 ```bash
-docker build -t image-multimodel .
+docker build -t image-duomodel .
 docker run --gpus all -p 8288:8288 \
   -v ./pretrained_models:/app/pretrained_models \
   -v ./outputs:/app/outputs \
-  image-multimodel
+  image-duomodel
 ```
 
 ---
@@ -109,9 +109,15 @@ docker run --gpus all -p 8288:8288 \
 
 | 工作流 | 推荐显存 | 用途 | 引擎 key |
 |---|---|---|---|
-| **Z Image Turbo** | ~4GB+ | 高速文生图、实时预览 | `z_image_turbo_native` |
-| **Qwen-Image 2.1 Edit** | ~11GB | 指令化图像编辑（支持参考图）、透明图 | `qwen_image_edit_native` |
-| **Flux.2 Klein 9B (fp8)** | ~12GB（需 offload） | 高质量文生图（照片级），需 CPU/RAM 卸载 | `flux2_klein_native` |
+| **Z Image Turbo** | ~4GB+ | 高速文生图、实时预览（核心默认） | `z_image_turbo_native` |
+| **Qwen-Image 2.1 Edit** | ~11GB | 指令化图像编辑（支持参考图）、透明图（核心） | `qwen_image_edit_native` |
+| **Flux.2 Klein 9B (fp8)** | ~12GB（需 offload） | 高质量文生图（照片级），需 CPU/RAM 卸载（核心） | `flux2_klein_native` |
+| Qwen3-VL 8B（看图聊天） | 视 config 配置而定 | VLM 图文对话 / 视觉理解（进阶） | `qwen3_vl_8b_native` |
+| Qwen-Image 2.1（文生图） | 视 config 配置而定 | Qwen 系列纯文生图（进阶） | `qwen_image_native` |
+| Krea2-turbo | 视 config 配置而定 | Krea2 风格文生图（进阶） | `krea2_turbo_native` |
+| FLUX.1-dev | 视 config 配置而定 | FLUX.1 原版文生图（进阶） | `flux1_dev_native` |
+
+> ℹ️ 进阶引擎（后 4 项）为实验性注册，权重路径、精度与显存占用以 `config.yaml → models.engines.<key>` 实际配置为准；未放置对应权重目录时不会加载。
 
 ---
 
@@ -265,9 +271,13 @@ python -m pytest tests/e2e -m e2e
 
 | 模型 | 引擎 key | 权重许可 | 商用 | 说明 |
 |---|---|---|---|---|
-| Z-Image Turbo（阿里通义） | `z_image_turbo_native` | Apache-2.0 | ✅ 可商用 | 默认引擎 |
-| Qwen-Image 2.1（阿里通义） | `qwen_image_edit_native` | Qwen Research License | ❌ 仅限非商业 | 编辑引擎；商用需向千问团队另行申请 |
-| FLUX.2 Klein 9B（Black Forest Labs） | `flux2_klein_native` | FLUX Non-Commercial | ❌ 仅限非商业 | 4B 变体为 Apache-2.0，9B/fp8/NVFP4 均为非商用 |
+| Z-Image Turbo（阿里通义） | `z_image_turbo_native` | Apache-2.0 | ✅ 可商用 | 默认引擎（核心） |
+| Qwen-Image 2.1 Edit（阿里通义） | `qwen_image_edit_native` | Qwen Research License | ❌ 仅限非商业 | 编辑引擎；商用需向千问团队另行申请（核心） |
+| FLUX.2 Klein 9B（Black Forest Labs） | `flux2_klein_native` | FLUX Non-Commercial | ❌ 仅限非商业 | 4B 变体为 Apache-2.0，9B/fp8/NVFP4 均为非商用（核心） |
+| Qwen3-VL 8B（阿里通义） | `qwen3_vl_8b_native` | Qwen Research License | ❌ 仅限非商业 | VLM 看图聊天（进阶，权重许可以模型卡为准） |
+| Qwen-Image 2.1 文生图（阿里通义） | `qwen_image_native` | Qwen Research License | ❌ 仅限非商业 | 纯文生图变体（进阶） |
+| Krea2-turbo | `krea2_turbo_native` | 见模型卡 | 待确认 | 进阶实验性引擎，许可与商用条件以上游模型卡为准 |
+| FLUX.1-dev（Black Forest Labs） | `flux1_dev_native` | FLUX Non-Commercial | ❌ 仅限非商业 | 进阶实验性引擎 |
 | SeedVR2（字节跳动，超分组件） | —（工作流内置） | Apache-2.0 | ✅ 可商用 | 见 NOTICE |
 
 ## 许可证

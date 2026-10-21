@@ -17,7 +17,7 @@
 services:
   imm-blue:
     profiles: ["blue"]
-    image: "image-multimodel:${BLUE_TAG:?BLUE_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}"
+    image: "image-duomodel:${BLUE_TAG:?BLUE_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}"
     container_name: imm-blue
     restart: "no"          # 由 bluegreen.sh 显式控制生命周期
     ports:
@@ -57,7 +57,7 @@ services:
 
   imm-green:
     profiles: ["green"]
-    image: "image-multimodel:${GREEN_TAG:?GREEN_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}"
+    image: "image-duomodel:${GREEN_TAG:?GREEN_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}"
     container_name: imm-green
     restart: "no"
     # idle 槽位只绑本机回环，不对外服务（单 GPU：不能与 active 同时常驻显存）

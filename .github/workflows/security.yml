@@ -82,12 +82,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t image-multimodel:scan .
+          docker build -t image-duomodel:scan .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0 (2026-04-22 官方攻击响应后最新稳定版; SHA pin 防 tag 强更)
         with:
-          image-ref: "image-multimodel:scan"
+          image-ref: "image-duomodel:scan"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true

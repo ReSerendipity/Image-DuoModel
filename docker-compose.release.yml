@@ -5,7 +5,7 @@
 #
 # 前置：
 #   1. 构建并推送镜像后取得 digest：
-#        docker buildx imagetools inspect image-multimodel:$IMAGE_TAG \
+#        docker buildx imagetools inspect image-duomodel:$IMAGE_TAG \
 #          --format '{{.Manifest.Digest}}'
 #   2. 写入 .env：
 #        python scripts/build_release_metadata.py --version v2.0.1 --digest sha256:<digest>
@@ -18,10 +18,10 @@
 #   python scripts/build_release_metadata.py --verify --strict
 
 services:
-  image-multimodel:
+  image-duomodel:
     # tag + digest 双重固定：即使有人重推同名 tag，digest 不匹配也不会被拉取
     # 同样必须用引号包裹，避免 ${VAR:?message} 中的冒号破坏 YAML 解析
-    image: "image-multimodel:${IMAGE_TAG:?IMAGE_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}@${IMAGE_DIGEST:?IMAGE_DIGEST 未设置 —— 生产部署必须按 digest 固化镜像，请运行 python scripts/build_release_metadata.py --version <ver> --digest sha256:...}"
+    image: "image-duomodel:${IMAGE_TAG:?IMAGE_TAG 未设置 —— 请先运行 python scripts/build_release_metadata.py}@${IMAGE_DIGEST:?IMAGE_DIGEST 未设置 —— 生产部署必须按 digest 固化镜像，请运行 python scripts/build_release_metadata.py --version <ver> --digest sha256:...}"
 
     # 生产环境显式关闭自动重启以外的隐式行为，保持与基础 compose 一致的挂载与端口
     restart: unless-stopped

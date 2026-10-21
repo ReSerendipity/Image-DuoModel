@@ -93,7 +93,7 @@ jobs:
           # 托管 runner 上必然报 could not select device driver "nvidia"。
           # 也不发布端口：config.yaml server.host=127.0.0.1，容器内只监听回环，
           # 主机经 -p 打不进去，故探活与 smoke 一律在容器内执行。
-          IMAGE="image-multimodel:${{ steps.tag.outputs.tag }}"
+          IMAGE="image-duomodel:${{ steps.tag.outputs.tag }}"
           docker build -t "$IMAGE" .
           docker run -d --name imm_drill -e IMM_FAKE_ENGINE=1 "$IMAGE"
           # 等待健康（最长 90s）

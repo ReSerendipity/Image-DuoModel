@@ -14,8 +14,8 @@
 
 | 层级 | 载体 | 是否可覆盖 | 落地位置 |
 |---|---|---|---|
-| 语义版本 / Git SHA | 镜像 tag | tag 可被重推 | `docker-compose.yml` → `image: image-multimodel:${IMAGE_TAG:?...}` |
-| 镜像 digest | `sha256:...` | **不可变** | `docker-compose.release.yml` → `image: image-multimodel:${IMAGE_TAG}@${IMAGE_DIGEST}` |
+| 语义版本 / Git SHA | 镜像 tag | tag 可被重推 | `docker-compose.yml` → `image: image-duomodel:${IMAGE_TAG:?...}` |
+| 镜像 digest | `sha256:...` | **不可变** | `docker-compose.release.yml` → `image: image-duomodel:${IMAGE_TAG}@${IMAGE_DIGEST}` |
 | 来源元数据 | `release/build_metadata.json` | 随构建生成 | 随镜像交付至 `/app/release/`，并作为 Release 附件 |
 
 ## 3. 操作步骤
@@ -35,11 +35,11 @@ python scripts/build_release_metadata.py --version v2.0.1
 
 # 2) 构建并推送（CI 的 release.yml 已自动执行）
 docker build --build-arg IMAGE_TAG=2.0.1 --build-arg GIT_SHA=$(git rev-parse HEAD) \
-  --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t image-multimodel:2.0.1 .
-docker push image-multimodel:2.0.1
+  --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t image-duomodel:2.0.1 .
+docker push image-duomodel:2.0.1
 
 # 3) 取 digest 并回写 .env（digest 只能通过 registry/inspect 获得，无法提前推导）
-DIGEST=$(docker buildx imagetools inspect image-multimodel:2.0.1 --format '{{.Manifest.Digest}}')
+DIGEST=$(docker buildx imagetools inspect image-duomodel:2.0.1 --format '{{.Manifest.Digest}}')
 python scripts/build_release_metadata.py --version v2.0.1 --digest "$DIGEST"
 
 # 4) 发布前校验（工作树必须干净、tag 不可变、快照无漂移、SBOM 存在）

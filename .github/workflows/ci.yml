@@ -72,7 +72,7 @@ jobs:
     name: Typecheck (mypy ratchet)
     # 原 mypy job 带 if: always()（lint/test 失败也出类型状态），迁移保留该语义
     if: always()
-    uses: ReSerendipity/.github/.github/workflows/python-quality-baseline.yml@main
+    uses: ReSerendipity/.github/.github/workflows/python-quality-baseline.yml@7c03273a862ffc8136ec886914c6105d77dce32d # pinned 2026-10-22
     with:
       package: app/integrated_app
       include_tests: false

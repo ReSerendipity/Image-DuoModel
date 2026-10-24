@@ -194,6 +194,10 @@ desktop/src-tauri/tauri.key
 
 # 发布构建产物（增量包/分卷）
 release/packages/
+
+# CI 生成的发布元数据与 SBOM（release.yml 运行时生成，随 Release 资产发布）
+release/build_metadata.json
+release/sbom.json
 desktop/src-tauri/target/
 
 # 安装器本地编译产物（不入库）

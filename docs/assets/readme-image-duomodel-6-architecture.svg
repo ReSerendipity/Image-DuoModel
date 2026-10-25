@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 720" font-family="-apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <style>
+      .layer-label { font-size: 13px; font-weight: 700; fill: #7c2d12; }
+      .box-title { font-size: 14px; font-weight: 700; fill: #1f2937; }
+      .box-sub { font-size: 11px; fill: #4b5563; }
+      .note { font-size: 11px; fill: #6b7280; }
+      .arrow { stroke: #9ca3af; stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+    </style>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L8,4.5 L0,9 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="720" fill="#faf7f2"/>
+
+  <text x="540" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#1f2937">Image DuoModel 架构总览 · In-process Native Engine</text>
+  <text x="540" y="58" text-anchor="middle" font-size="12" fill="#6b7280">FastAPI + Uvicorn · SPA · SSE 实时推送 · 复用 comfy_kernel 源码，单进程完成加载→编码→采样→解码</text>
+
+  <!-- Layer 1: Client -->
+  <rect x="60" y="85" width="960" height="70" rx="10" fill="#fff" stroke="#f0c9a8"/>
+  <text x="80" y="108" class="layer-label">客户端 / Browser</text>
+  <rect x="200" y="112" width="220" height="32" rx="6" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="310" y="132" text-anchor="middle" class="box-title">单页 Web UI (SPA)</text>
+  <rect x="450" y="112" width="220" height="32" rx="6" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="560" y="132" text-anchor="middle" class="box-title">SSE 实时事件流 /api/events</text>
+  <rect x="700" y="112" width="280" height="32" rx="6" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="840" y="132" text-anchor="middle" class="box-title">五语言 i18n · 主题 · 引擎切换</text>
+
+  <!-- Layer 2: API / Middleware -->
+  <rect x="60" y="180" width="960" height="90" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="80" y="203" class="layer-label">API 层 · FastAPI / Uvicorn</text>
+  <rect x="200" y="212" width="150" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="275" y="229" text-anchor="middle" class="box-title">REST 路由</text>
+  <text x="275" y="244" text-anchor="middle" class="box-sub">generate / engine / task</text>
+  <rect x="365" y="212" width="150" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="440" y="229" text-anchor="middle" class="box-title">安全中间件</text>
+  <text x="440" y="244" text-anchor="middle" class="box-sub">CSRF · RateLimit · PathGuard</text>
+  <rect x="530" y="212" width="150" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="605" y="229" text-anchor="middle" class="box-title">任务队列</text>
+  <text x="605" y="244" text-anchor="middle" class="box-sub">异步 · 取消 · 断点续跑</text>
+  <rect x="695" y="212" width="150" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="770" y="229" text-anchor="middle" class="box-title">SQLite 历史</text>
+  <text x="770" y="244" text-anchor="middle" class="box-sub">搜索 / 筛选 / 预览</text>
+  <rect x="860" y="212" width="120" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="920" y="229" text-anchor="middle" class="box-title">预设</text>
+  <text x="920" y="244" text-anchor="middle" class="box-sub">Preset</text>
+
+  <!-- Layer 3: Native Engine -->
+  <rect x="60" y="295" width="960" height="120" rx="10" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="80" y="318" class="layer-label">进程内原生引擎 · NativeEngine（单进程，无外部 ComfyUI）</text>
+  <rect x="200" y="328" width="170" height="70" rx="6" fill="#fff" stroke="#f97316"/>
+  <text x="285" y="348" text-anchor="middle" class="box-title">z_image_turbo</text>
+  <text x="285" y="363" text-anchor="middle" class="box-sub">高速文生图（默认）</text>
+  <text x="285" y="378" text-anchor="middle" class="box-sub">~4GB VRAM</text>
+  <rect x="385" y="328" width="170" height="70" rx="6" fill="#fff" stroke="#f97316"/>
+  <text x="470" y="348" text-anchor="middle" class="box-title">qwen_image_edit</text>
+  <text x="470" y="363" text-anchor="middle" class="box-sub">指令式图像编辑</text>
+  <text x="470" y="378" text-anchor="middle" class="box-sub">~11GB VRAM</text>
+  <rect x="570" y="328" width="170" height="70" rx="6" fill="#fff" stroke="#f97316"/>
+  <text x="655" y="348" text-anchor="middle" class="box-title">flux2_klein</text>
+  <text x="655" y="363" text-anchor="middle" class="box-sub">高质量照片级文生图</text>
+  <text x="655" y="378" text-anchor="middle" class="box-sub">~12GB（需 offload）</text>
+  <rect x="755" y="328" width="225" height="70" rx="6" fill="#fff" stroke="#d1d5db" stroke-dasharray="4 3"/>
+  <text x="867" y="348" text-anchor="middle" class="box-title">进阶实验引擎（可选注册）</text>
+  <text x="867" y="363" text-anchor="middle" class="box-sub">qwen3_vl / qwen_image /</text>
+  <text x="867" y="378" text-anchor="middle" class="box-sub">krea2_turbo / flux1_dev</text>
+
+  <!-- Layer 4: Kernel -->
+  <rect x="60" y="435" width="960" height="80" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="80" y="458" class="layer-label">推理内核（sys.path 注入 · 复用 comfy_kernel 源码）</text>
+  <rect x="200" y="466" width="200" height="38" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="300" y="489" text-anchor="middle" class="box-title">comfy.sd / samplers / VAE</text>
+  <rect x="420" y="466" width="200" height="38" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="520" y="489" text-anchor="middle" class="box-title">LoRA 6 层叠加 · 显存预检</text>
+  <rect x="640" y="466" width="200" height="38" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="740" y="489" text-anchor="middle" class="box-title">SeedVR2 超分 · Eses 对比</text>
+  <rect x="860" y="466" width="120" height="38" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="920" y="489" text-anchor="middle" class="box-title">DCT 水印</text>
+
+  <!-- Layer 5: Storage / Config -->
+  <rect x="60" y="535" width="960" height="70" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="80" y="558" class="layer-label">配置与产物</text>
+  <rect x="200" y="566" width="150" height="30" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="275" y="586" text-anchor="middle" class="box-sub">config.yaml（引擎声明）</text>
+  <rect x="365" y="566" width="150" height="30" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="440" y="586" text-anchor="middle" class="box-sub">workflows/ JSON</text>
+  <rect x="530" y="566" width="150" height="30" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="605" y="586" text-anchor="middle" class="box-sub">pretrained_models/</text>
+  <rect x="695" y="566" width="150" height="30" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="770" y="586" text-anchor="middle" class="box-sub">outputs/ 产物</text>
+  <rect x="860" y="566" width="120" height="30" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="920" y="586" text-anchor="middle" class="box-sub">data/ SQLite</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M540,155 L540,180"/>
+  <path class="arrow" d="M540,270 L540,295"/>
+  <path class="arrow" d="M540,415 L540,435"/>
+  <path class="arrow" d="M540,515 L540,535"/>
+
+  <text x="60" y="640" class="note">说明：引擎在首次调用时按需加载（/api/engine/load），非启动期全量加载；权重路径与精度以 config.yaml → models.engines.&lt;key&gt; 为准。</text>
+  <text x="60" y="660" class="note">安全：PathGuard 路径规范化、CSRF Token、速率限制、关键模块 SHA256 完整性自检、输出图自动嵌入 DCT 频域水印（product_id · task_id · timestamp）。</text>
+  <text x="60" y="680" class="note">桌面壳：desktop/ 内 Tauri v2 + NSIS 安装器（Windows，开发中）。</text>
+</svg>

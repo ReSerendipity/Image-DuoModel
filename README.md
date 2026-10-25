@@ -43,27 +43,27 @@
 
 **生图工作台主页** —— Prompt 输入、引擎切换、最近生成结果一览：
 
-![主界面](docs/assets/readme-image-duomodel-1-main.png)
+![主界面](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main.png)
 
 **高级参数面板** —— CFG / Steps / 尺寸 / Seed / 六层 LoRA 等 22 项参数即时生效：
 
-![高级参数](docs/assets/readme-image-duomodel-2-params.png)
+![高级参数](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params.png)
 
 **图片展示** —— 全部 / 原图 / 超分 / 对比图分类浏览生成产物：
 
-![结果展示](docs/assets/readme-image-duomodel-3-results.png)
+![结果展示](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
 
 **Eses 双图对比** —— 同一 Prompt 的原图与对比图并排比对：
 
-![双图对比](docs/assets/readme-image-duomodel-4-compare.png)
+![双图对比](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
 
 **历史记录** —— SQLite 任务历史，支持搜索、状态筛选、引擎筛选与详情：
 
-![历史记录](docs/assets/readme-image-duomodel-5-history.png)
+![历史记录](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history.png)
 
 **系统架构** —— 从浏览器到进程内原生引擎的分层结构：
 
-![架构图](docs/assets/readme-image-duomodel-6-architecture.svg)
+![架构图](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-6-architecture.svg)
 
 ### 快速开始
 
@@ -198,27 +198,27 @@ Four additional experimental engines are registered on demand (Qwen3-VL visual c
 
 **Generation workbench home** — prompt input, engine switch, recent generations:
 
-![Main UI](docs/assets/readme-image-duomodel-1-main.png)
+![Main UI](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main.png)
 
 **Advanced parameters** — CFG / Steps / size / seed / 6-layer LoRA, 22 settings applied live:
 
-![Advanced params](docs/assets/readme-image-duomodel-2-params.png)
+![Advanced params](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params.png)
 
 **Gallery** — browse outputs by all / original / upscale / compare:
 
-![Results gallery](docs/assets/readme-image-duomodel-3-results.png)
+![Results gallery](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
 
 **Eses dual-image compare** — original vs. comparison image side by side:
 
-![Compare](docs/assets/readme-image-duomodel-4-compare.png)
+![Compare](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
 
 **History** — SQLite task history with search, status and engine filters:
 
-![History](docs/assets/readme-image-duomodel-5-history.png)
+![History](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history.png)
 
 **Architecture** — layered view from browser to the in-process native engine:
 
-![Architecture](docs/assets/readme-image-duomodel-6-architecture.svg)
+![Architecture](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-6-architecture.svg)
 
 ### Quick Start
 

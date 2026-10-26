@@ -120,6 +120,8 @@ docker-compose.override.yml
 
 # Auto-captured screenshots (output of tests/capture-screenshots.js)
 /screenshots/
+# 截图归档为本地暂存，不入库；README 展示图统一放 docs/assets/readme-*（治理 §8.1）
+docs/screenshots/
 
 # 水印签名密钥（仅本机，严禁入库/随包分发）
 .watermark_key

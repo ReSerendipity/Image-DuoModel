@@ -55,9 +55,9 @@
 
 ![结果展示](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
 
-**Eses 双图对比** —— 同一 Prompt 的原图与对比图并排比对：
+**对比与显存预留设置** —— Eses 双图对比开关、对比轴（h/v/s）与 ReservedVRAM 显存预留：
 
-![双图对比](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
+![对比与显存预留](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
 
 **历史记录** —— SQLite 任务历史，支持搜索、状态筛选、引擎筛选与详情：
 
@@ -212,9 +212,9 @@ Four additional experimental engines are registered on demand (Qwen3-VL visual c
 
 ![Results gallery](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
 
-**Eses dual-image compare** — original vs. comparison image side by side:
+**Compare & VRAM reservation settings** — Eses dual-image toggle, compare axis (h/v/s), and ReservedVRAM:
 
-![Compare](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
+![Compare settings](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
 
 **History** — SQLite task history with search, status and engine filters:
 

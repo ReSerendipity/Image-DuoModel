@@ -41,25 +41,27 @@
 
 ### 界面展示
 
+> 以下截图在无 GPU 的云端环境实拍（CPU 后端、引擎未加载、未放置权重），图库与历史因此呈空态；实际生成画面请在配好 NVIDIA GPU 与权重的本机使用。
+
 **生图工作台主页** —— Prompt 输入、引擎切换、最近生成结果一览：
 
-![主界面](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main.png)
+![主界面](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main-20261026.png)
 
 **高级参数面板** —— CFG / Steps / 尺寸 / Seed / 六层 LoRA 等 22 项参数即时生效：
 
-![高级参数](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params.png)
+![高级参数](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params-20261026.png)
 
 **图片展示** —— 全部 / 原图 / 超分 / 对比图分类浏览生成产物：
 
-![结果展示](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
+![结果展示](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results-20261026.png)
 
-**Eses 双图对比** —— 同一 Prompt 的原图与对比图并排比对：
+**对比与显存预留设置** —— Eses 双图对比开关、对比轴（h/v/s）与 ReservedVRAM 显存预留：
 
-![双图对比](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
+![对比与显存预留](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare-20261026.png)
 
 **历史记录** —— SQLite 任务历史，支持搜索、状态筛选、引擎筛选与详情：
 
-![历史记录](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history.png)
+![历史记录](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history-20261026.png)
 
 **系统架构** —— 从浏览器到进程内原生引擎的分层结构：
 
@@ -196,25 +198,27 @@ Four additional experimental engines are registered on demand (Qwen3-VL visual c
 
 ### Screenshots
 
+> These screenshots were captured on a CPU-only cloud build (no GPU, engines unloaded, no weights), so the gallery and history show their empty state. Generate real images on a machine with an NVIDIA GPU and the model weights installed.
+
 **Generation workbench home** — prompt input, engine switch, recent generations:
 
-![Main UI](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main.png)
+![Main UI](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main-20261026.png)
 
 **Advanced parameters** — CFG / Steps / size / seed / 6-layer LoRA, 22 settings applied live:
 
-![Advanced params](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params.png)
+![Advanced params](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-2-params-20261026.png)
 
 **Gallery** — browse outputs by all / original / upscale / compare:
 
-![Results gallery](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results.png)
+![Results gallery](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-3-results-20261026.png)
 
-**Eses dual-image compare** — original vs. comparison image side by side:
+**Compare & VRAM reservation settings** — Eses dual-image toggle, compare axis (h/v/s), and ReservedVRAM:
 
-![Compare](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare.png)
+![Compare settings](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-4-compare-20261026.png)
 
 **History** — SQLite task history with search, status and engine filters:
 
-![History](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history.png)
+![History](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-5-history-20261026.png)
 
 **Architecture** — layered view from browser to the in-process native engine:
 

@@ -41,6 +41,8 @@
 
 ### 界面展示
 
+> 以下截图在无 GPU 的云端环境实拍（CPU 后端、引擎未加载、未放置权重），图库与历史因此呈空态；实际生成画面请在配好 NVIDIA GPU 与权重的本机使用。
+
 **生图工作台主页** —— Prompt 输入、引擎切换、最近生成结果一览：
 
 ![主界面](https://gcore.jsdelivr.net/gh/ReSerendipity/Image-DuoModel@main/docs/assets/readme-image-duomodel-1-main.png)
@@ -195,6 +197,8 @@ Four additional experimental engines are registered on demand (Qwen3-VL visual c
 - **5 UI languages** — zh, zh-TW, en, ja, ko.
 
 ### Screenshots
+
+> These screenshots were captured on a CPU-only cloud build (no GPU, engines unloaded, no weights), so the gallery and history show their empty state. Generate real images on a machine with an NVIDIA GPU and the model weights installed.
 
 **Generation workbench home** — prompt input, engine switch, recent generations:
 

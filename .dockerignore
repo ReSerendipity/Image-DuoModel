@@ -34,3 +34,16 @@ WPy64-*/
 backups/
 screenshots/
 demo/
+
+# 5) 凭据与本地笔记（2026-10-29 补）：docker build 按本文件取上下文，
+#    不排掉就会把真实环境变量与水印签名密钥写进镜像层（README 直接教本机构建）。
+#    口径与 scripts/package_app.py 的便携包排除清单一致。
+.env
+.env.*
+!.env.example
+.watermark_key
+local/
+AGENTS.md
+LOCAL_RULES.md
+FIX_LOG.md
+.qoder/

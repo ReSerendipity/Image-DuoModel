@@ -90,3 +90,40 @@ class TestVerifyWatermarkScript:
 
         # 无水印 → 校验失败
         assert result.returncode == 1
+
+    def test_verify_rejects_foreign_signature(self, tmp_path, monkeypatch):
+        """签名有效才算通过：换成另一把密钥签发的同内容水印必须判失败（2026-10-29）"""
+        import os
+
+        monkeypatch.setenv("IMAGE_MULTIMODEL_WATERMARK_KEY", "key-issuer-A")
+        rng = np.random.default_rng(42)
+        img = (128 + rng.normal(0, 5, (256, 256))).clip(0, 255)
+        marked = watermark.embed_watermark(img, "img_multimodel", "task_signed_001", 1786200000.0)
+        npy_path = tmp_path / "signed.npy"
+        np.save(npy_path, marked)
+
+        # 正控：同一把密钥校验 → 通过
+        ok_env = {**os.environ, "IMAGE_MULTIMODEL_WATERMARK_KEY": "key-issuer-A"}
+        ok = subprocess.run(
+            [sys.executable, str(SCRIPT_PATH), str(npy_path)],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=10,
+            env=ok_env,
+        )
+        assert ok.returncode == 0, ok.stdout + ok.stderr
+        assert "HMAC 校验通过" in ok.stdout
+
+        # 反控：换一把密钥（product_id 仍然相符）→ 必须失败
+        bad_env = {**os.environ, "IMAGE_MULTIMODEL_WATERMARK_KEY": "key-issuer-B"}
+        bad = subprocess.run(
+            [sys.executable, str(SCRIPT_PATH), str(npy_path)],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=10,
+            env=bad_env,
+        )
+        assert bad.returncode == 1, "签名无效却判通过：" + bad.stdout
+        assert "❌" in bad.stdout

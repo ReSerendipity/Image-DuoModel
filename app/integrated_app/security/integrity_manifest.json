@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T23:09:51.876425",
+  "generated_at": "2026-10-29T22:32:24.434048",
   "generator": "scripts/generate_integrity_manifest.py",
   "description": "核心安全模块 SHA256 完整性清单，用于启动时自检",
   "files": {
@@ -15,7 +15,7 @@
     "i18n.py": "bc5bf24956a36a8332285b681f454a46d932d424550f88359987649df919a914",
     "gpu_utils.py": "4bd76f5843948cf534f627243a137804c3eeb5ace1a80ebf095c049d564e01f6",
     "sse.py": "f71e498269d867b9902c9587acce06e98fae0ec28151063bb99b42974cb366f3",
-    "watermark.py": "34bb0bfbade164824fa4fc24787b56fd56ddb2e8758d9d472b370e07525263f2",
+    "watermark.py": "6b861df1eb6e632e42b896f7fadfd267c0e74e21223026aa769fab9d14dd1d70",
     "checkpoint.py": "4d3b67b991cafc99d8ceca87337b25607c97b2bda305637770bb06123f5ac28f",
     "security/path_guard.py": "d1a1e108647e314c7c029522c5042d1ea6b407144095a2cb7b9eec4abccbe4da",
     "security/magic_check.py": "1a03d4edb7fefb846ca31678c99735c053c5a602cce7ee65590a7c81cd1bc677",

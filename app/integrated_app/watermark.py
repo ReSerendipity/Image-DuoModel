@@ -131,6 +131,23 @@ def _verify_signed(signed_payload: str, key: bytes) -> str | None:
 
 
 # ── 嵌入 / 提取 ─────────────────────────────────────────
+def has_secret_key() -> bool:
+    """是否配置了签名密钥（决定用户侧校验是强校验还是弱校验）。"""
+    return _load_secret_key() is not None
+
+
+def verify_extracted(signed_payload: str) -> str | None:
+    """校验「已提取出来的」签名载荷；返回去掉签名后的原始载荷，无密钥或签名无效返回 None。
+
+    与 verify() 的区别：verify() 会按参数重新嵌入再比对，要求调用方先知道 task_id/timestamp；
+    本函数直接用提取到的字符串验签，适合 CLI 这类先读载荷再判断的场景。
+    """
+    key = _load_secret_key()
+    if key is None:
+        return None
+    return _verify_signed(signed_payload, key)
+
+
 def embed_watermark(
     image: np.ndarray,
     product_id: str,
@@ -177,7 +194,7 @@ def embed_watermark(
             payload = _sign_payload(payload, key)
         else:
             logger.debug(
-                "未配置水印签名密钥，将嵌入未签名水印（不可证伪归属）。" "请运行 scripts/init_watermark_key.py 生成密钥"
+                "未配置水印签名密钥，将嵌入未签名水印（不可证伪归属）。请运行 scripts/init_watermark_key.py 生成密钥"
             )
         bits = _str_to_bits(payload)
 

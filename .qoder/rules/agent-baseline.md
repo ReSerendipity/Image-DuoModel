@@ -44,7 +44,8 @@ paths:
   不用 `--no-verify` 绕过钩子。
 - 动手修 CI 红灯前先读交接台账 `docs/runbooks/ci_fix_ledger.md`（随仓库分发）：**同一失败签名
   第二次出现禁止再朝同方向重试**，必须读完整失败日志或 `git revert` 换策略。
-- 修复 Bug / 踩坑后须把坑点追加到 `local/agents/GOTCHAS.md`（该文件随仓库分发）。
+- 修复 Bug / 踩坑后须把坑点追加到 `docs/GOTCHAS.md`（这份随仓库分发）。更长的本机笔记在
+  `local/agents/GOTCHAS.md`，该路径所在的 `local/` 按仓库策略不入库、**不随克隆分发**，别把它当作可交付位置。
 
 ## 5. 🧹 构建产物滚动清理
 

@@ -8,7 +8,7 @@
 |---|---|---|
 | 分支保护 | GitHub Branch Protection（main 需 required checks；仓库所有者 admin 已开**直推豁免**，非 admin 仍需 PR + 1 审批） | ✅ |
 | DCO 签名 | .githooks/commit-msg 强制 Signed-off-by | ✅ |
-| 代码审查 | PR 需 review | ⚠️ 待配置 CODEOWNERS |
+| 代码审查 | PR 需 review；`.github/CODEOWNERS` 已存在（分区负责人），但分支保护里 `require_code_owner_reviews=false`，所以它只做路由通知、不强制指定人审批 | ⚠️ 部分（CODEOWNERS 已配，强制审批未开） |
 
 ## 代码安全
 
@@ -16,8 +16,8 @@
 |---|---|---|
 | 密钥扫描 | gitleaks（pre-commit + CI） | ✅ |
 | 依赖漏洞扫描 | pip-audit / Dependabot | ✅ |
-| SAST | CodeQL / Semgrep | ✅ |
-| 静态分析 | ruff / flake8 / eslint | ✅ |
+| SAST | CodeQL（`.github/workflows/codeql.yml`）。Semgrep 未在本仓启用 | ✅ CodeQL / ⛔ Semgrep 未启用 |
+| 静态分析 | ruff（`ci.yml` lint 步骤：`ruff check app/ tests/ scripts/`）+ mypy ratchet（组织级 reusable）。flake8、eslint 未在本仓启用 | ✅ ruff+mypy / ⛔ flake8、eslint 未启用 |
 | 完整性校验 | Ed25519 签名清单 | ✅ |
 
 ## 数据安全

@@ -151,7 +151,7 @@ Web UI 本身可以在 CPU 环境启动浏览界面与配置；实际图像生�
 项目代码为 Apache-2.0。但模型权重许可各异：Z-Image Turbo 可商用；Qwen-Image 2.1 Edit、Flux.2 Klein 9B 等为研究/非商业许可，商用前请参阅各模型卡与 [NOTICE](NOTICE)。
 
 **Q5：输出图可以追溯吗？**
-可以。所有输出图自动嵌入 DCT 频域水印，用 `python scripts/verify_watermark.py <png>` 校验。
+可以。所有输出图自动嵌入 DCT 频域水印，用 `python scripts/verify_watermark.py <png>` 校验：配置了签名密钥（`IMAGE_MULTIMODEL_WATERMARK_KEY` 或项目根 `.watermark_key`）时按 HMAC 签名判定（签名无效即失败）；未配置密钥时只能做弱校验，输出会明确标注。
 
 ### 文档与治理
 
@@ -306,7 +306,7 @@ Weights are not shipped. Place them under `pretrained_models/` (portable mode); 
 Project code is Apache-2.0. Model weights vary: Z-Image Turbo is commercial-friendly; Qwen-Image 2.1 Edit and Flux.2 Klein 9B are research/non-commercial licenses. Read each model card and [NOTICE](NOTICE) before commercial use.
 
 **Q5: Are outputs traceable?**
-Yes. Every output carries a DCT frequency-domain watermark; verify with `python scripts/verify_watermark.py <png>`.
+Yes. Every output carries a DCT frequency-domain watermark; verify with `python scripts/verify_watermark.py <png>`. With a signing key configured (`IMAGE_MULTIMODEL_WATERMARK_KEY` or a project-root `.watermark_key`) the check is an HMAC signature verification and fails on a bad signature; without a key it degrades to a weak product-id comparison and says so in the output.
 
 ### Docs & Governance
 

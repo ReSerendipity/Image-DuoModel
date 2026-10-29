@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.1](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.0...v2.1.1) (2026-10-29)
+
+
+### Changed
+
+* **docs:** README 对外/对内双版本更新 + 治理规范引用，展示图改用 jsDelivr CDN 并按日期重命名（消除 CDN 陈旧缓存），并在云端桌面重拍真实截图 ([5013e08](https://github.com/ReSerendipity/Image-DuoModel/commit/5013e085019cb19381e15368ae4f3184fdda5d8d)) ([9cc1640](https://github.com/ReSerendipity/Image-DuoModel/commit/9cc16401b8b52cff9b4bb1e81f08355f6302d574)) ([67581e8](https://github.com/ReSerendipity/Image-DuoModel/commit/67581e8dc8408b53413cefa53956359fa527845a)) ([a938463](https://github.com/ReSerendipity/Image-DuoModel/commit/a9384631cbafb6a6859269f6cc17ab2858028d4f))
+* **docs:** 归档评估报告、运维说明与界面截图；docs 事实性与一致性修正（对齐 README/AGENTS） ([e092523](https://github.com/ReSerendipity/Image-DuoModel/commit/e0925236d348a43e4bb6fe32249c33b9e4a44b3e)) ([dd5bfe9](https://github.com/ReSerendipity/Image-DuoModel/commit/dd5bfe9f26ee6c1bb4c86d3bfa5a375a19940c65))
+* **governance:** 落地 agent 契约与公开精简版 AGENTS.md（AGENTS.md 转为本地文件，不再跟踪）；agent 家族迁位 + SECURITY 入口 + 镜像名对齐 ([d710bbb](https://github.com/ReSerendipity/Image-DuoModel/commit/d710bbb8a935785a2b39a9c0b1d1172219fb73c0)) ([d1cd8c3](https://github.com/ReSerendipity/Image-DuoModel/commit/d1cd8c314aaff8bfab595e7c366b5f297efdb39f)) ([1a87c95](https://github.com/ReSerendipity/Image-DuoModel/commit/1a87c953f1df51ba47ddd7a71feea3ed2e4ee131))
+* **ci:** 复用工作流 pin 固定到不可变 SHA（7c03273 → 0512272，含 agent 契约规则）；self-purify 接入冻结为阻断式复用工作流 ([801c334](https://github.com/ReSerendipity/Image-DuoModel/commit/801c3341370f02fec1f981d832f92059a05da2d1)) ([a43f4d5](https://github.com/ReSerendipity/Image-DuoModel/commit/a43f4d5cb0fcebe5a4aec87f3063807df57f2519)) ([fc94c62](https://github.com/ReSerendipity/Image-DuoModel/commit/fc94c62fae5339f6aed59bbe471d328de03c219c))
+* **release:** 停止跟踪 CI 生成的发布元数据与 SBOM（改由远端 Release 资产承载）；release-please 创建 Release 后同 run dispatch release.yml 补资产（§10.1，PAT-free） ([95ac019](https://github.com/ReSerendipity/Image-DuoModel/commit/95ac0196077408bf42fdb0c7ee7a9f6c6d1fee17)) ([fe0b167](https://github.com/ReSerendipity/Image-DuoModel/commit/fe0b1674687b3f32973fd648fbbf4bf13f658585))
+* **repo:** 忽略截图归档目录并取消已暂存图片的跟踪；同步组织级 PR 模板的截图溯源章节 ([5a6672a](https://github.com/ReSerendipity/Image-DuoModel/commit/5a6672abbd240c7f16f77dde4bf60268dffa90e5)) ([190f150](https://github.com/ReSerendipity/Image-DuoModel/commit/190f150b3631da49e890d20fa89ff465b0225322))
+* **deps:** pillow 12.3.0 → 13.0.0；certifi 2026.7.22 → 2026.10.19；undici 8.11.2 → 8.12.3（tests） ([e7a3ef7](https://github.com/ReSerendipity/Image-DuoModel/commit/e7a3ef75c98d58ea7b1076579625bd03e3c9d8ca)) ([359fec1](https://github.com/ReSerendipity/Image-DuoModel/commit/359fec1ff9a31341da5995b253f2bc4057d5bd86)) ([fbf9978](https://github.com/ReSerendipity/Image-DuoModel/commit/fbf9978d0605480410a917b07c51d73ecd6ad050))
+
 ## [2.1.0](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.0.0...v2.1.0) (2026-10-20)
 
 

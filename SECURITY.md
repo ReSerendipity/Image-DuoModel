@@ -6,7 +6,7 @@
 
 | Version | Status |
 |---------|--------|
-| 2.1.0（main branch） | ✅ Actively maintained |
+| 2.1.1（main branch） | ✅ Actively maintained |
 | 1.x / v1.5.x（historical tags） | ❌ End of life |
 
 ## Reporting a Vulnerability

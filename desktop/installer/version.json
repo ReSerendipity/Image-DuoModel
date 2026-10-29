@@ -1,6 +1,6 @@
 {
-    "changelog":  "v2.1.0：应用版本位对齐 release-please 2.1.0 权威线（2026-10-20 发布，权威位 .release-please-manifest.json = 2.1.0），桌面分发层同步；release_date 更新为实际发布日",
-    "version":  "2.1.0",
-    "release_date":  "2026-10-20",
+    "changelog":  "v2.1.1：patch 维护版（2026-10-29 发布，权威位 .release-please-manifest.json = 2.1.1），桌面分发层同步；自 v2.1.0 起仅为 docs/chore/ci 维护改动，无功能变更",
+    "version":  "2.1.1",
+    "release_date":  "2026-10-29",
     "minimum_shell_version":  "1.0.0"
 }

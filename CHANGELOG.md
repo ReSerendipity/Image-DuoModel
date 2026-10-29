@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.1...v2.1.2) (2026-10-29)
+
+
+### Bug Fixes
+
+* **harness:** 修 4 条 better-harness 发现（水印验签 / 镜像上下文 / 安全矩阵 / 基线路径） ([b43d12e](https://github.com/ReSerendipity/Image-DuoModel/commit/b43d12e64c5ce2c80f177f07c77199080e81ccae))
+
 ## [2.1.1](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.0...v2.1.1) (2026-10-29)
 
 

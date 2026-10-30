@@ -201,6 +201,26 @@ jobs:
             echo "       并设仓库变量 HAS_STAGING_SECRETS=true 后重跑。"
             exit 1
           fi
+
+      - name: Refuse to promote on a runner without the target host
+        run: |
+          # 蓝绿切换必须在目标 GPU 机器上执行（见本文件头「环境要求」）。托管 runner 上
+          # 既没有 /opt/imm 的槽位状态，也没有 docker 与 GPU：跑下去只会空转，或把
+          # 「没报错」误当成「已晋级」。缺目标主机时硬失败，不静默跳过。
+          # 接上 self-hosted runner 或 PROD_* SSH 之后，删掉本步即可。
+          DEPLOY_ROOT="${IMM_DEPLOY_ROOT:-/opt/imm}"
+          if [ ! -d "$DEPLOY_ROOT" ]; then
+            echo "[FAIL] 当前 runner 上没有目标部署目录 $DEPLOY_ROOT —— 生产晋级必须在能访问目标 GPU 机器的主机上执行。"
+            echo "       处置：把本 job 移到 self-hosted runner，或用 PROD_HOST / PROD_USER / PROD_SSH_KEY 走 SSH 在目标机上执行。"
+            echo "       在此之前生产晋级不可用，勿把绿色 build 当作已发布。详见 docs/runbooks/service_startup.md §生产晋级。"
+            exit 1
+          fi
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "[FAIL] 当前 runner 没有 docker，蓝绿切换无法执行。"
+            exit 1
+          fi
+          echo "[OK] 目标部署目录与 docker 均就绪：$DEPLOY_ROOT"
+
       - name: Promote (delegate to blue-green script with automatic rollback)
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}

@@ -67,3 +67,17 @@ tail -n 100 logs/*.log
 - P1：通知值班（on-call）。
 - P0（启动持续失败 >5min 影响线上）：升级服务 Owner，触发回滚决策。
 - 每次启动失败事故写 post-mortem（`docs/ops/post_mortem_template.md`）。
+
+## 生产晋级（当前不可用，2026-10-30 记录）
+`deploy.yml` 的 `production` job 目前跑在 `ubuntu-latest` 上，而蓝绿切换必须落在目标 GPU 机器。
+两者不匹配时，job 会**空转**（没有 `/opt/imm` 槽位状态、没有 docker、没有 GPU），最坏情况是把
+「没报错」当成「已晋级」。
+
+自 2026-10-30 起该 job 增加硬失败守卫：检测不到 `${IMM_DEPLOY_ROOT:-/opt/imm}` 或没有 docker 就
+`exit 1`，**不会**再静默跑过。因此在补上目标主机之前：
+
+- **生产晋级不可用**，绿色 build 不等于已发布；
+- 恢复方式二选一：① 把 `production` job 移到能访问目标机、带 docker/GPU 的 self-hosted runner；
+  ② 参照 `staging` 的 SSH 模式（`PROD_HOST` / `PROD_USER` / `PROD_SSH_KEY`）在目标机上执行
+  `scripts/deploy/bluegreen.sh`；
+- 两条路都需要先确认远端仓库路径与槽位状态文件位置，再删掉那条守卫步骤。

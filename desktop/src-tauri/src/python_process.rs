@@ -9,11 +9,39 @@ use std::os::windows::process::CommandExt;
 
 use crate::port_manager::find_free_port;
 
+/// 从 HTTP 响应头里取 CSRF token：优先响应头 `X-CSRF-Token`（家族部分仓由中间件直接下发），
+/// 回退解析 `Set-Cookie: csrf_token=...`（部分仓的 CSRF 中间件只种 cookie，不发头）。
+fn extract_csrf_token(headers: &str) -> Option<String> {
+    let mut cookie_token: Option<String> = None;
+    for line in headers.lines() {
+        let lower = line.to_ascii_lowercase();
+        if let Some(rest) = lower.strip_prefix("x-csrf-token:") {
+            let idx = line.len() - rest.len();
+            let value = line[idx..].trim();
+            if !value.is_empty() {
+                return Some(value.to_string());
+            }
+        }
+        if lower.starts_with("set-cookie:") && lower.contains("csrf_token=") {
+            // 形如：Set-Cookie: csrf_token=<value>; Path=/; SameSite=Strict
+            let after = &line[line.find("csrf_token=")? + "csrf_token=".len()..];
+            let value = after.split(';').next().unwrap_or("").trim();
+            if !value.is_empty() {
+                cookie_token = Some(value.to_string());
+            }
+        }
+    }
+    cookie_token
+}
+
 /// 请求 Python 服务本机优雅关闭（桌面端 B-5）。
-/// 用裸 TcpStream 走 HTTP CSRF double-submit（GET /api/health 取 token →
-/// POST 带 cookie + X-CSRF-Token 同值），避免为 reqwest 引入 blocking 依赖。
-/// 后端 `/api/system/shutdown` 是普通 CSRF 保护端点（v1.3.0 补全，此前不存在
-/// 导致本 POST 恒 403、优雅关闭形同虚设，见 GOTCHAS #53 同型幻影契约）。
+///
+/// 自适应 CSRF：先 GET `/api/system/health` 取 token，再以 double-submit（cookie + 头同值）
+/// POST `/api/system/shutdown`；取不到 token 时按「CSRF 关闭」直接 POST。
+///
+/// 为什么要自适应：家族四仓实现分叉——Image 强制带 token（CSRF 默认开）、SeedVR2/TTS/VOSR2
+/// 直接裸 POST（CSRF 默认关）。任一固定写法在另一种配置下都会静默失效（403 → 退化成
+/// taskkill，优雅关闭形同虚设）。统一为自适应后，四仓同一份实现即可覆盖两种配置。
 fn request_graceful_shutdown(port: u16) -> bool {
     use std::io::{Read, Write};
     use std::net::TcpStream;
@@ -22,14 +50,15 @@ fn request_graceful_shutdown(port: u16) -> bool {
     let Ok(addr) = format!("127.0.0.1:{port}").parse::<std::net::SocketAddr>() else {
         return false;
     };
-    // 1) GET /api/health 取 CSRF token（中间件在 GET 响应头下发 X-CSRF-Token）
+
+    // 1) GET 健康检查，顺带取 CSRF token（中间件在安全方法响应上补种）
     let token = {
         let Ok(mut s) = TcpStream::connect_timeout(&addr, Duration::from_millis(800)) else {
             return false;
         };
         let _ = s.set_read_timeout(Some(Duration::from_millis(1500)));
         let req = format!(
-            "GET /api/health HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"
+            "GET /api/system/health HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nConnection: close\r\n\r\n"
         );
         if s.write_all(req.as_bytes()).is_err() {
             return false;
@@ -40,26 +69,22 @@ fn request_graceful_shutdown(port: u16) -> bool {
         }
         let head = String::from_utf8_lossy(&buf);
         let headers = head.split("\r\n\r\n").next().unwrap_or("");
-        let mut tok = String::new();
-        for line in headers.lines() {
-            if let Some(rest) = line.to_ascii_lowercase().strip_prefix("x-csrf-token:") {
-                tok = rest.trim().to_string();
-                break;
-            }
-        }
-        if tok.is_empty() {
-            return false;
-        }
-        tok
+        extract_csrf_token(headers)
     };
-    // 2) POST /api/system/shutdown 带 double-submit（cookie 与 header 同值）
+
+    // 2) POST 关闭端点（有 token 走 double-submit，无 token 裸 POST）
     let Ok(mut s) = TcpStream::connect_timeout(&addr, Duration::from_millis(800)) else {
         return false;
     };
     let _ = s.set_read_timeout(Some(Duration::from_millis(1500)));
-    let req = format!(
-        "POST /api/system/shutdown HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nCookie: csrf_token={token}\r\nX-CSRF-Token: {token}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-    );
+    let req = match token {
+        Some(tok) => format!(
+            "POST /api/system/shutdown HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nCookie: csrf_token={tok}\r\nX-CSRF-Token: {tok}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+        ),
+        None => format!(
+            "POST /api/system/shutdown HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+        ),
+    };
     if s.write_all(req.as_bytes()).is_err() {
         return false;
     }
@@ -358,4 +383,33 @@ pub fn resolve_app_dir() -> PathBuf {
     }
 
     root
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_token_prefers_header() {
+        let headers = "HTTP/1.1 200 OK\r\nX-CSRF-Token: abc.def\r\nSet-Cookie: csrf_token=zzz; Path=/";
+        assert_eq!(extract_csrf_token(headers).as_deref(), Some("abc.def"));
+    }
+
+    #[test]
+    fn extract_token_falls_back_to_cookie() {
+        let headers = "HTTP/1.1 200 OK\r\nset-cookie: csrf_token=nonce.sig; Path=/; SameSite=Strict\r\n";
+        assert_eq!(extract_csrf_token(headers).as_deref(), Some("nonce.sig"));
+    }
+
+    #[test]
+    fn extract_token_returns_none_when_absent() {
+        let headers = "HTTP/1.1 200 OK\r\ncontent-type: application/json";
+        assert_eq!(extract_csrf_token(headers), None);
+    }
+
+    #[test]
+    fn extract_token_ignores_other_cookies() {
+        let headers = "HTTP/1.1 200 OK\r\nset-cookie: theme=dark; Path=/\r\n";
+        assert_eq!(extract_csrf_token(headers), None);
+    }
 }

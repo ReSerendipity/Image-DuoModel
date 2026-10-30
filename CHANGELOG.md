@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.3](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.2...v2.1.3) (2026-10-30)
+
+
+### Bug Fixes
+
+* **ci:** 生产晋级在缺目标主机时硬失败，不再在托管 runner 上空转 ([d07f61e](https://github.com/ReSerendipity/Image-DuoModel/commit/d07f61ec1cf9827ab6531b1f92180bd75fce8f95))
+* **deps:** 升级 filelock / virtualenv / python-discovery / setuptools，清 19 个告警 ([cc3d8e1](https://github.com/ReSerendipity/Image-DuoModel/commit/cc3d8e172f3bfcbda933f282b2e7215cb30ccdec))
+
 ## [2.1.2](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.1...v2.1.2) (2026-10-29)
 
 

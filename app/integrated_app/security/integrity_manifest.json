@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-29T22:32:24.434048",
+  "generated_at": "2026-10-31T18:35:47.472527",
   "generator": "scripts/generate_integrity_manifest.py",
   "description": "核心安全模块 SHA256 完整性清单，用于启动时自检",
   "files": {
-    "app_server.py": "bbead8f264a28f65e090a838c77e4ae54450b64116819646110e5f79c29ace53",
+    "app_server.py": "45d67d0eeb5b2f8b8c2345030dd6f763d5d061b25b95b6c9473bcd135bcad478",
     "config.py": "0ca2a677c439299bb4280d36376b6a7fc8c2641e6d39b383435325740371db34",
     "config_models.py": "921f455404b19cb35a84d4234d9e0a2871081bf7f3a35af12b3474bce727d6d5",
     "engine_interface.py": "75df5ff61d47e8e6c6a157516b9f9a2035d2c72b5823b76e9b20a3a3e751494b",
@@ -19,7 +19,7 @@
     "checkpoint.py": "4d3b67b991cafc99d8ceca87337b25607c97b2bda305637770bb06123f5ac28f",
     "security/path_guard.py": "d1a1e108647e314c7c029522c5042d1ea6b407144095a2cb7b9eec4abccbe4da",
     "security/magic_check.py": "1a03d4edb7fefb846ca31678c99735c053c5a602cce7ee65590a7c81cd1bc677",
-    "security/integrity_selfcheck.py": "1c8115b0f831fef33ac2f8be00da8302a046161015ceec143906e14678b56417",
+    "security/integrity_selfcheck.py": "b20ab058b6efbe02e7e54935a248712a15acc2766a9d9c9d3cede833316d3284",
     "security/weight_integrity.py": "be677eb6ca5c46d0706febd0ade5754af5329be994d06e73d2067dfa473d774e",
     "security/content_filter.py": "a8a5e37a025ff0e483f4301680b7463c6d69cd5144d7e2297f55ac23944a9715",
     "security/kernel_baseline.py": "beb4b77d4671a3222864af0709c0251ac5d7dde3a9c34c048aa0fea9969f3bd4",
@@ -35,6 +35,8 @@
     "routes/output_routes.py": "ae0b3313c34fa26fd3bb6d8fa5f750a82aaf3beaee3e48f844e24107a6e4074f",
     "routes/preset_routes.py": "c48cbf1d85a6911f5016f625bbeb47d282d9f32225c449c1929d0515520b7b4a",
     "routes/engine_routes.py": "a8ce846209315d777703a8750bb72534d9217c52fecf9ed51d39e1d88b44bc94",
-    "mcp_server.py": "9a494171a3e0ee36d23aab2e104e218cdc8e379a88df7225c7dac26643d2e898"
+    "mcp_server.py": "9a494171a3e0ee36d23aab2e104e218cdc8e379a88df7225c7dac26643d2e898",
+    "routes/downloads.py": "1136d4003a7875ec454abcb3f1ab6283eeae9d24eb37d5df4bcab049d9174978",
+    "download_service.py": "8e99cecc3e734c27c491b2cc4aa84be6b6de2b8acff767354ea8f95e45c933e0"
   }
 }

@@ -308,32 +308,105 @@ pub fn emit_startup_status(app: &AppHandle, message: &str, error: Option<String>
     });
 }
 
-/// 解析运行时目录：优先侧载 runtime，开发模式回退项目 .venv，再退系统 Python
+/// 环境安装成功后由后端写入解释器目录的元信息文件名（必须与
+/// `app/integrated_app/download_service.py::RUNTIME_META_NAME` 一致）。
+const RUNTIME_META_FILE: &str = "RUNTIME.json";
+
+/// 当前 Python 运行时的形态（决定壳把用户带到哪个页面）
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PythonMode {
+    /// 完整运行时（含 torch），可正常推理
+    Full,
+    /// 瘦包自带的引导解释器（只有 Web 依赖、无 torch）：
+    /// 首次启动就是这个形态，此时唯一能干的事是打开「下载管理」页
+    Bootstrap,
+    /// 开发态 .venv 或系统 Python
+    Dev,
+}
+
+/// 判定当前运行时形态。
+///
+/// 与 `resolve_runtime_dir` **共用同一套解析结果**（直接拿它返回的目录判形态），
+/// 避免两处优先级分叉出现「跑在引导解释器上却导航到首页」的错位。
+///
+/// 判据必须是「环境安装流程写下的 RUNTIME.json」，不能只看 `site-packages/torch`：
+/// WinPython 完整版自带 CPU 版 torch（实测 552 MB、CUDA 不可用），只看 torch
+/// 目录会把「未装环境」误判成 Full → 用户永远看不到下载管理页，也就永远装不上
+/// 真正的 cu128 环境。RUNTIME.json 只在我们装完环境后写入。
+pub fn detect_python_mode(app_dir: &Path) -> PythonMode {
+    let dir = resolve_runtime_dir(app_dir);
+    if !dir.join("python.exe").exists() {
+        return PythonMode::Dev;
+    }
+    match dir.file_name().and_then(|n| n.to_str()).unwrap_or("") {
+        "runtime" => PythonMode::Full,
+        "bootstrap" => {
+            if dir.join(RUNTIME_META_FILE).exists() {
+                PythonMode::Full
+            } else {
+                PythonMode::Bootstrap
+            }
+        }
+        // .venv/Scripts 或系统 python
+        _ => PythonMode::Dev,
+    }
+}
+
+/// 运行时未装齐时，主窗口应该落到哪个入口（空串 = 首页）
+pub fn startup_entry(mode: PythonMode) -> &'static str {
+    match mode {
+        PythonMode::Bootstrap => "downloads",
+        PythonMode::Full | PythonMode::Dev => "",
+    }
+}
+
+/// 解析运行时目录：优先侧载 runtime，其次瘦包内置引导解释器 bootstrap，
+/// 开发模式回退项目 .venv，再退系统 Python。
+///
+/// 本仓约定：`runtime/` 与 `bootstrap/` 都在**安装根**（与 `app/` 平级），
+/// 所以先看壳自身所在的安装根，再看 `app/` 内的历史嵌套布局。后端
+/// `download_service._runtime_dir()` 与打包脚本 `scripts/build_desktop_bundle.ps1`
+/// 必须与这里保持同一优先级，改动时三处同步。
 pub fn resolve_runtime_dir(app_dir: &Path) -> PathBuf {
     // 1. 打包后（分层定案布局）：安装根下的 runtime/（app/ 的兄弟目录）
     //    v1.3.0 修复：壳 1.0.0 只认 app/runtime/，与桌面分发分层定案 §2 的
     //    <安装根>/runtime/ 布局不符，导致装后 Python 永远无法启动（P1，
     //    v1.3.0 阶段3 真机安装模拟实测发现）。
     if let Ok(exe) = std::env::current_exe() {
-        let sibling = exe.parent().unwrap().join("runtime");
-        if sibling.join("python.exe").exists() {
-            return sibling;
+        if let Some(root) = exe.parent() {
+            let sibling = root.join("runtime");
+            if sibling.join("python.exe").exists() {
+                return sibling;
+            }
+            // 1b. 瘦包：安装根下的引导解释器 bootstrap/。
+            //     它没有 torch，唯一职责是把「下载管理」页跑起来，让用户能装环境。
+            //     缺这一层时瘦包启动即失败，用户没有任何自救通道。
+            let boot = root.join("bootstrap");
+            if boot.join("python.exe").exists() {
+                return boot;
+            }
         }
     }
 
-    // 1b. 打包后（历史布局）：应用目录下的 runtime/
+    // 2. 打包后（历史布局）：应用目录下的 runtime/
     let bundled = app_dir.join("runtime");
     if bundled.join("python.exe").exists() {
         return bundled;
     }
 
-    // 2. 开发模式 A：app_dir 即项目根（.venv 在其下）
+    // 2b. 历史嵌套布局：应用目录下的 bootstrap/
+    let boot_bundled = app_dir.join("bootstrap");
+    if boot_bundled.join("python.exe").exists() {
+        return boot_bundled;
+    }
+
+    // 3. 开发模式 A：app_dir 即项目根（.venv 在其下）
     let dev_local = app_dir.join(".venv").join("Scripts");
     if dev_local.join("python.exe").exists() {
         return dev_local;
     }
 
-    // 2b. 开发模式 A'：app_dir 为 <root>/app（本项目开发布局），.venv 在上一级
+    // 3b. 开发模式 A'：app_dir 为 <root>/app（本项目开发布局），.venv 在上一级
     if let Some(parent) = app_dir.parent() {
         let dev_local2 = parent.join(".venv").join("Scripts");
         if dev_local2.join("python.exe").exists() {
@@ -341,7 +414,7 @@ pub fn resolve_runtime_dir(app_dir: &Path) -> PathBuf {
         }
     }
 
-    // 3. 开发模式 B：app_dir 为 exe_dir/app，.venv 位于上两级（历史布局）
+    // 4. 开发模式 B：app_dir 为 exe_dir/app，.venv 位于上两级（历史布局）
     let dev_venv = app_dir
         .parent()
         .and_then(|p| p.parent())
@@ -352,7 +425,7 @@ pub fn resolve_runtime_dir(app_dir: &Path) -> PathBuf {
         }
     }
 
-    // 4. 回退：系统 PATH 中的 python
+    // 5. 回退：系统 PATH 中的 python
     PathBuf::from("python")
 }
 
@@ -411,5 +484,96 @@ mod tests {
     fn extract_token_ignores_other_cookies() {
         let headers = "HTTP/1.1 200 OK\r\nset-cookie: theme=dark; Path=/\r\n";
         assert_eq!(extract_csrf_token(headers), None);
+    }
+
+    // ---------------- 运行时形态判定（瘦包引导态） ----------------
+
+    /// 造一个临时 app 目录，可在其下预置 runtime/ 或 bootstrap/（含占位 python.exe）
+    fn make_app_dir(tag: &str, subdir: Option<&str>) -> PathBuf {
+        let base = std::env::temp_dir().join(format!(
+            "imgmulti-mode-{}-{}",
+            tag,
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("创建临时 app 目录");
+        if let Some(sub) = subdir {
+            let dir = base.join(sub);
+            std::fs::create_dir_all(&dir).expect("创建解释器目录");
+            std::fs::write(dir.join("python.exe"), b"").expect("写入占位解释器");
+        }
+        base
+    }
+
+    #[test]
+    fn mode_is_full_when_runtime_present() {
+        let app = make_app_dir("full", Some("runtime"));
+        assert_eq!(detect_python_mode(&app), PythonMode::Full);
+        assert_eq!(startup_entry(PythonMode::Full), "");
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn mode_is_bootstrap_when_only_bootstrap_present() {
+        let app = make_app_dir("boot", Some("bootstrap"));
+        assert_eq!(detect_python_mode(&app), PythonMode::Bootstrap);
+        // 引导态必须落到下载管理页，否则用户看到的只是个跑不了推理的空壳
+        assert_eq!(startup_entry(PythonMode::Bootstrap), "downloads");
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn mode_is_full_when_bootstrap_has_runtime_meta() {
+        let app = make_app_dir("boot-meta", Some("bootstrap"));
+        // 环境装进 bootstrap 自身后目录名不变，靠 RUNTIME.json 判定
+        std::fs::write(app.join("bootstrap").join("RUNTIME.json"), b"{}").unwrap();
+        assert_eq!(detect_python_mode(&app), PythonMode::Full);
+        assert_eq!(startup_entry(detect_python_mode(&app)), "");
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn mode_is_bootstrap_when_bundled_torch_without_meta() {
+        // 回归：WinPython 完整版自带 CPU 版 torch（无 CUDA）。
+        // 只看 site-packages/torch 会误判成已装环境，用户将永远看不到下载管理页。
+        let app = make_app_dir("boot-cpu-torch", Some("bootstrap"));
+        let site = app.join("bootstrap").join("Lib").join("site-packages").join("torch");
+        std::fs::create_dir_all(&site).unwrap();
+        assert_eq!(detect_python_mode(&app), PythonMode::Bootstrap);
+        assert_eq!(startup_entry(detect_python_mode(&app)), "downloads");
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn mode_prefers_runtime_over_bootstrap() {
+        let app = make_app_dir("both", Some("bootstrap"));
+        std::fs::create_dir_all(app.join("runtime")).unwrap();
+        std::fs::write(app.join("runtime").join("python.exe"), b"").unwrap();
+        assert_eq!(detect_python_mode(&app), PythonMode::Full);
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn mode_is_dev_when_neither_present() {
+        let app = make_app_dir("dev", None);
+        assert_eq!(detect_python_mode(&app), PythonMode::Dev);
+        assert_eq!(startup_entry(PythonMode::Dev), "");
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn resolve_runtime_dir_falls_back_to_bootstrap() {
+        let app = make_app_dir("resolve", Some("bootstrap"));
+        assert_eq!(resolve_runtime_dir(&app), app.join("bootstrap"));
+        let _ = std::fs::remove_dir_all(&app);
+    }
+
+    #[test]
+    fn resolve_runtime_dir_prefers_app_runtime_over_bootstrap() {
+        let app = make_app_dir("resolve-both", Some("bootstrap"));
+        std::fs::create_dir_all(app.join("runtime")).unwrap();
+        std::fs::write(app.join("runtime").join("python.exe"), b"").unwrap();
+        assert_eq!(resolve_runtime_dir(&app), app.join("runtime"));
+        let _ = std::fs::remove_dir_all(&app);
     }
 }

@@ -38,9 +38,27 @@ pub struct AppPaths {
 }
 
 /// 主窗口导航到后端应用地址
+///
+/// 落点由运行时形态决定（与 `python_process::detect_python_mode` 同一判据）：
+/// 引导态（瘦包，无 torch）只有「下载管理」页可用，必须先让用户装环境；
+/// 装完环境（RUNTIME.json 存在）或开发态才落首页。
 fn navigate_to_app(app: &AppHandle, port: u16) {
+    let entry = match app.try_state::<Arc<AppPaths>>() {
+        Some(paths) => {
+            let mode = python_process::detect_python_mode(&paths.app_dir);
+            let entry = python_process::startup_entry(mode);
+            log::info!("运行时形态: {:?}，导航入口: '{}'", mode, entry);
+            entry
+        }
+        None => "",
+    };
+
     if let Some(win) = app.get_webview_window(window::MAIN_LABEL) {
-        let url = format!("http://127.0.0.1:{}/", port);
+        let url = if entry.is_empty() {
+            format!("http://127.0.0.1:{}/", port)
+        } else {
+            format!("http://127.0.0.1:{}/{}", port, entry)
+        };
         match url.parse() {
             Ok(url) => {
                 let _ = win.navigate(url);

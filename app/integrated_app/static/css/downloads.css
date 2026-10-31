@@ -1,0 +1,52 @@
+/* downloads.css — 「下载管理」页样式（CSP 收紧后不允许内联样式，样式集中在此）
+   令牌沿用 seed.css 的 @seed-* / --accent / --surface 系列，跟随明暗主题自动适配。 */
+
+.dl-wrap{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+
+.dl-hero{margin-bottom:22px}
+.dl-hero h1{font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:.02em;margin-bottom:6px}
+.dl-hero p{color:var(--ink-soft);font-size:13px;line-height:1.7;max-width:70ch}
+
+.dl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.dl-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid var(--seed-border);background:var(--surface);color:var(--ink-soft);font-size:12px}
+.dl-chip.ok{border-color:color-mix(in srgb,var(--green) 45%,var(--seed-border));color:var(--green)}
+.dl-chip.warn{border-color:color-mix(in srgb,var(--amber) 55%,var(--seed-border));color:var(--warn-ink)}
+.dl-chip.err{border-color:color-mix(in srgb,var(--red) 45%,var(--seed-border));color:var(--red)}
+
+.dl-card{background:var(--surface);border:1px solid var(--seed-border);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;box-shadow:0 1px 10px rgba(45,36,24,.04)}
+.dl-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.dl-card-head h2,.dl-models h2{font-size:14px;font-weight:600}
+.dl-models h2{margin-bottom:12px}
+.dl-tag{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--seed-border);white-space:nowrap}
+.dl-tag.ok{background:var(--accent-soft);color:var(--accent-strong);border-color:var(--accent-40)}
+.dl-tag.err{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,var(--seed-border))}
+
+.dl-note{font-size:12px;color:var(--ink-soft);line-height:1.7;margin-bottom:10px}
+.dl-note.mono{font-family:ui-monospace,monospace;font-size:11px;word-break:break-all}
+
+.dl-meter{height:6px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin:4px 0 14px}
+.dl-meter-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-strong));transition:width .25s ease}
+
+.dl-actions{display:flex;flex-wrap:wrap;gap:8px}
+.dl-btn{height:30px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--seed-border);background:var(--surface-2);color:var(--ink);font-size:12px}
+.dl-btn:hover:not(:disabled){border-color:var(--accent-40);background:var(--surface)}
+.dl-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.dl-btn.primary:hover:not(:disabled){background:var(--accent-deep)}
+.dl-btn.danger{color:var(--red);border-color:color-mix(in srgb,var(--red) 35%,var(--seed-border))}
+.dl-btn:disabled{opacity:.45;cursor:not-allowed}
+
+.dl-model-list{display:grid;gap:12px}
+.dl-model{border:1px solid var(--seed-border);border-radius:var(--radius-sm);padding:14px 16px;background:var(--surface)}
+.dl-model .dl-card-head{margin-bottom:4px}
+.dl-model h3{font-size:13px;font-weight:600}
+.dl-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--ink-faint);margin:6px 0 10px}
+.dl-meta b{color:var(--ink-soft);font-weight:600}
+
+.dl-foot{margin-top:26px;text-align:center}
+.dl-foot a{color:var(--accent-strong);font-size:12px;text-decoration:none}
+.dl-foot a:hover{text-decoration:underline}
+
+@media (max-width:640px){
+  .dl-wrap{padding:20px 14px 56px}
+  .dl-hero h1{font-size:22px}
+}

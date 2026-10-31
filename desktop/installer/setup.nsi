@@ -66,7 +66,9 @@ Section "Image MultiModel 桌面版" SEC_APP
   RMDir /r "$TOOLSDIR"
   CreateDirectory "$TOOLSDIR"
   SetOutPath "$TOOLSDIR"
-  File "${SRC_7ZA}"
+  ; 必带 /oname=7za.exe：编译机给的可能是 7z.exe，不重命名时下面 ExecWait "$TOOLSDIR\7za.exe"
+  ; 找不到文件 → 进程根本没起来 → $0 是空串 → 弹「数据解压失败（错误码 ）」，安装目录空着。
+  File /oname=7za.exe "${SRC_7ZA}"
   File "killimgmulti.ps1"
 
   !insertmacro KillRunning
@@ -83,6 +85,16 @@ Section "Image MultiModel 桌面版" SEC_APP
   ExecWait '"$TOOLSDIR\7za.exe" x "$EXEDIR\${DATA_PREFIX}.001" -o"$INSTDIR" -y -bso0 -bsp0' $0
   ${If} $0 != 0
     MessageBox MB_ICONSTOP "数据解压失败（7za 错误码 $0）。`n请检查：1) 磁盘空间是否充足；2) 数据分卷是否完整（SHA256 校验见随附说明）。"
+    Abort
+  ${EndIf}
+
+  ; 载荷结构校验：瘦包的 app\ 与 bootstrap\ 必须都在，否则壳启动必失败
+  ${IfNot} ${FileExists} "$INSTDIR\app\integrated_app\app_server.py"
+    MessageBox MB_ICONSTOP "安装异常：未找到 app\integrated_app\app_server.py，数据分卷可能不完整。"
+    Abort
+  ${EndIf}
+  ${IfNot} ${FileExists} "$INSTDIR\bootstrap\python.exe"
+    MessageBox MB_ICONSTOP "安装异常：未找到 bootstrap\python.exe（瘦包引导解释器），数据分卷可能不完整。"
     Abort
   ${EndIf}
 

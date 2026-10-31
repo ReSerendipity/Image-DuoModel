@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ i18n.get('dl_title', '下载管理') }} · Image MultiModel{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="/static/css/downloads.css">
+{% endblock %}
+
+{% block content %}
+{# 文案全部走服务端渲染（CSP 禁用内联脚本，JS 侧从 data-i18n 的 JSON 里取 window.__I18N__） #}
+<main class="dl-wrap" id="dlRoot" data-component="Download Manager"
+      data-i18n="{{ i18n_json }}"
+      data-app-version="{{ version }}">
+  <header class="dl-hero">
+    <h1>{{ i18n.get('dl_title', '下载管理') }}</h1>
+    <p>{{ i18n.get('dl_intro', '') }}</p>
+    <div class="dl-chips">
+      <span class="dl-chip" id="dlModeChip">{{ i18n.get('dl_mode_unknown', '') }}</span>
+      <span class="dl-chip" id="dlEnvChip">{{ i18n.get('dl_env_unknown', '') }}</span>
+      <span class="dl-chip" id="dlReadyChip">…</span>
+    </div>
+  </header>
+
+  <section class="dl-card" data-component="Runtime Card">
+    <div class="dl-card-head">
+      <h2>{{ i18n.get('dl_runtime_title', '') }}</h2>
+      <span class="dl-tag" id="dlRuntimeState">…</span>
+    </div>
+    <p class="dl-note" id="dlRuntimeNote">{{ i18n.get('dl_loading', '') }}</p>
+    <p class="dl-note mono" id="dlRuntimePath"></p>
+    <div class="dl-meter"><div class="dl-meter-bar" id="dlRuntimeBar"></div></div>
+    <div class="dl-actions">
+      <button class="dl-btn primary" id="dlRuntimeInstall" type="button">{{ i18n.get('dl_install', '') }}</button>
+      <button class="dl-btn" id="dlRuntimeCancel" type="button" disabled>{{ i18n.get('dl_cancel', '') }}</button>
+      <button class="dl-btn danger" id="dlRuntimeUninstall" type="button" disabled>{{ i18n.get('dl_uninstall', '') }}</button>
+    </div>
+  </section>
+
+  <section class="dl-models" data-component="Model List">
+    <h2>{{ i18n.get('dl_models_title', '') }}</h2>
+    <div class="dl-model-list" id="dlModelList">
+      <p class="dl-note">{{ i18n.get('dl_loading', '') }}</p>
+    </div>
+  </section>
+
+  <footer class="dl-foot"><a href="/">{{ i18n.get('dl_back_home', '') }}</a></footer>
+</main>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/downloads.js" defer></script>{% endblock %}

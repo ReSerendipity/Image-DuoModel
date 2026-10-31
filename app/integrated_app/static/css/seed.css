@@ -540,3 +540,7 @@ pre.cfg{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;co
 .imm-agreement-list{margin:0 0 10px;padding-left:18px}
 .imm-agreement-label{display:flex;gap:8px;align-items:flex-start;margin:12px 0}
 .imm-agreement-btn{width:100%;padding:9px 0;opacity:.5}
+
+/* ===== 下载管理入口（index.html 顶栏用 <a class="icon-btn">，锚点需去掉下划线）===== */
+a.icon-btn{text-decoration:none;color:var(--ink-soft)}
+a.icon-btn:hover{text-decoration:none}

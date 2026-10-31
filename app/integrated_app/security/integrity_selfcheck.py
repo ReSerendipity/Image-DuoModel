@@ -66,6 +66,8 @@ _CORE_MODULES = [
     "routes/output_routes.py",
     "routes/preset_routes.py",
     "routes/engine_routes.py",
+    "routes/downloads.py",
+    "download_service.py",
     "mcp_server.py",
 ]
 

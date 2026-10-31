@@ -1,6 +1,6 @@
 [package]
 name = "imgmulti-desktop"
-version = "1.0.0"
+version = "1.0.2"
 description = "Image MultiModel 桌面应用壳"
 authors = ["ReSerendipity"]
 edition = "2021"

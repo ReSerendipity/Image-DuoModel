@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "note": "下载管理页的环境包清单基线。发版时由 scripts/build_desktop_bundle.ps1 -Mode runtime 覆盖为含真实分卷名与 SHA256 的版本；volumes 为空表示尚未发布环境包，页面会提示清单缺失。",
+  "runtime": {
+    "version": "1",
+    "tag": "runtime-v1",
+    "base_url": "https://github.com/ReSerendipity/Image-DuoModel/releases/download/runtime-v1",
+    "python": "3.12.10",
+    "torch": "2.10.0+cu128",
+    "cuda": "cu128",
+    "packages": [
+      "torch==2.10.0",
+      "torchvision==0.25.0"
+    ],
+    "size_bytes": 0,
+    "built_at": null,
+    "min_app_version": "2.1.1",
+    "volumes": []
+  },
+  "models": []
+}

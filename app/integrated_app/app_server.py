@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import json
 import logging
 import logging.handlers
 import os
@@ -41,7 +42,19 @@ from .middleware.csrf import CSRFMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.request_id import RequestIDMiddleware
 from .middleware.security_headers import SecurityHeadersMiddleware
-from .model_registry import get_model_registry
+
+# 瘦包引导态（无 torch）必须能把后端起起来，否则用户既看不到「下载管理」页，
+# 也没有别的自救通道。模型注册表会顺带拉起引擎工厂，故按可选依赖处理：
+# 缺失/导入失败时置 None，lifespan 跳过初始化，引擎类路由在路由发现阶段已被
+# 逐模块 try/except 跳过（见 _auto_discover_routers）。
+try:  # pragma: no cover - 有 torch 的常规环境走正常分支
+    from .model_registry import get_model_registry
+except Exception as _registry_exc:  # noqa: BLE001 - 任何导入期异常都降级
+    get_model_registry = None  # type: ignore[assignment]
+    logging.getLogger("integrated_app").warning(
+        "[BOOTSTRAP] 模型注册表不可用（将降级为仅 Web 能力）：%s", _registry_exc
+    )
+
 from .observability.alerts import (
     get_alert_engine,
     health_unhealthy,
@@ -168,6 +181,22 @@ def setup_logging(config) -> None:
         handlers=handlers,
         force=True,
     )
+
+
+def _runtime_form() -> str:
+    """当前后端跑在哪种解释器上（与壳 detect_python_mode 的判据保持一致）。"""
+    from .download_service import current_mode
+
+    return current_mode()
+
+
+def _startup_entry() -> str:
+    """未装环境时应用应该落到的页面入口（空串 = 首页）。
+
+    引导态（无 torch）只有「下载管理」页可用，落到首页会让用户看到一个
+    跑不了推理的空壳；装完环境后（RUNTIME.json 存在）回到首页。
+    """
+    return "downloads" if _runtime_form() == "bootstrap" else ""
 
 
 @asynccontextmanager
@@ -655,10 +684,21 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Failed to resume checkpoint: {e}")
 
-    # 初始化 ModelRegistry
-    model_registry = get_model_registry()
-    model_registry.init_from_config(config)
+    # 初始化 ModelRegistry（引导态下 get_model_registry 为 None：跳过并留空状态，
+    # 引擎类路由在引导态本就不可用，用户在「下载管理」页装完环境后重启即可恢复）
+    model_registry = None
+    if get_model_registry is not None:
+        try:
+            model_registry = get_model_registry()
+            model_registry.init_from_config(config)
+        except Exception as e:  # noqa: BLE001 - 引擎装配失败不得阻断下载管理页
+            logger.error("[BOOTSTRAP] 模型注册表初始化失败，引擎功能不可用：%s", e)
+            model_registry = None
     app.state.model_registry = model_registry
+
+    # 运行形态日志：瘦包首启应打印 bootstrap，装完环境重启后为 full。
+    # （docs/桌面分发分层定案 的验收项：真机安装后据此确认落地页）
+    logger.info("运行形态: %s，导航入口: '%s'", _runtime_form(), _startup_entry())
 
     logger.info(f"=== Image MultiModel ready on http://{config.server.host}:{config.server.port} ===")
 
@@ -886,6 +926,34 @@ def create_app(enable_rate_limit: bool = True) -> FastAPI:
         @app.get("/", include_in_schema=False)
         async def index(request: Request):
             return templates.TemplateResponse(request, "index.html", _page_ctx(request))
+
+        def _downloads_i18n(locale: str) -> dict:
+            """「下载管理」页文案：取 locales/<lang>.json 的 dl_*/nav_downloads，缺键回退中文。
+
+            为什么服务端拼 JSON：CSP 收紧为 script-src 'self' 后不能写内联脚本，
+            而页面脚本需要 window.__I18N__，故由模板把 JSON 放进 data 属性，
+            再让 downloads.js 解析到 window.__I18N__（与家族仓同一套取法）。
+            """
+            from .i18n import _load_translations
+
+            base = _load_translations("zh") or {}
+            current = _load_translations(locale) or {}
+            keys = [k for k in base if str(k).startswith("dl_")] + ["nav_downloads"]
+            merged: dict[str, str] = {}
+            for key in keys:
+                value = current.get(key) or base.get(key)
+                if isinstance(value, str) and value:
+                    merged[key] = value
+            return merged
+
+        @app.get("/downloads", include_in_schema=False)
+        async def downloads_page(request: Request):
+            """瘦包的落地页：安装环境与下载模型（必须注册在 catch-all 之前）。"""
+            ctx = _page_ctx(request)
+            i18n = _downloads_i18n(str(ctx.get("locale_file") or "zh"))
+            ctx["i18n"] = i18n
+            ctx["i18n_json"] = json.dumps(i18n, ensure_ascii=False)
+            return templates.TemplateResponse(request, "downloads.html", ctx)
 
         @app.get("/{full_path:path}", include_in_schema=False)
         async def catch_all(request: Request, full_path: str):

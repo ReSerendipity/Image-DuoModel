@@ -90,6 +90,13 @@ _OPTIONAL_EXACT = {"app/runtime", "release/packages"}
 # 可选 / 版本化外部运行时目录（本机 Python 分发，非仓库内容）。
 _RUNTIME_PATTERNS = [re.compile(r"^WPy\d"), re.compile(r"^WinPython", re.IGNORECASE)]
 # 行内出现这些限定语时，其路径引用属"条件/计划"表述（铁律 #6 允许），不作失效判定。
+# 「禁止入库」清单里的路径是"必须不存在于仓库"的反向约束（docs/plans、AGENTS.md 自身等），
+# 同句出现的路径不构成"必须存在"的引用；若不豁免，任何干净检出都会因这些反向约束而无法提交。
+_NON_REQUIRED_MARKERS = ("禁止入库", "不得入库", "禁止提交", "禁止跟踪", "**例外**")
+
+# 由 ReSerendipity/.github 统一维护、本仓不提供的路径前缀（治理模板 / 契约模板）。
+_EXTERNAL_PREFIXES = (".github/governance/",)
+
 _CONDITIONAL_MARKERS = (
     "若本仓存在",
     "当前本仓无",
@@ -117,6 +124,9 @@ def _looks_pathlike(norm: str, *, is_link: bool, children: set[str]) -> bool:
     if not norm or " " in norm or "`" in norm:
         return False
     if "://" in norm or norm.startswith("mailto:") or _ABS_RE.match(norm):
+        return False
+    if any(norm.startswith(p) for p in _EXTERNAL_PREFIXES):
+        # 外部仓（ReSerendipity/.github）维护的模板路径，本仓不提供
         return False
     stripped = norm.rstrip("/")
     segs = [s for s in stripped.split("/") if s]
@@ -149,7 +159,7 @@ def _is_runtime_dir(norm: str) -> bool:
 
 
 def _line_is_conditional(line: str) -> bool:
-    return any(m in line for m in _CONDITIONAL_MARKERS)
+    return any(m in line for m in _CONDITIONAL_MARKERS) or any(m in line for m in _NON_REQUIRED_MARKERS)
 
 
 def _iter_candidates(text: str):

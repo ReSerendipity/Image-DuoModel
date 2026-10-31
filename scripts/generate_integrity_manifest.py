@@ -55,6 +55,8 @@ DEFAULT_CORE_MODULES = [
     "routes/output_routes.py",
     "routes/preset_routes.py",
     "routes/engine_routes.py",
+    "routes/downloads.py",
+    "download_service.py",
 ]
 
 CHUNK_SIZE = 8 * 1024 * 1024  # 8MB

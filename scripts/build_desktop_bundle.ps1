@@ -309,6 +309,16 @@ if ($buildSlim) {
         Write-Warning "  未找到 downloads_catalog.json，下载管理页将提示清单缺失"
     }
 
+    # 完整性公钥必须进卷：ExcludeFiles 里的 *.pem 会把 manifest_signing_public_key.pem
+    # 一并剔掉 → enforce 自检无法验签 → 拒绝启动（真机踩过）。私钥是 dotfile
+    # （.manifest_signing_key 等），仍被排除，不受影响。
+    $pubKey = Join-Path $Root 'app\integrated_app\security\manifest_signing_public_key.pem'
+    if (Test-Path -LiteralPath $pubKey) {
+        Copy-Item -LiteralPath $pubKey -Destination (Join-Path $appOut 'integrated_app\security\manifest_signing_public_key.pem') -Force
+    } else {
+        Write-Warning "  未找到完整性公钥（manifest_signing_public_key.pem），enforce 自检将拒绝启动"
+    }
+
     # 运行态空目录骨架（首次安装就要存在，避免运行期首次写盘失败）
     foreach ($d in @('data\cache', 'data\uploads', 'outputs', 'logs')) {
         New-Item -ItemType Directory -Path (Join-Path $appOut $d) -Force | Out-Null

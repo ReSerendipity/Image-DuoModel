@@ -414,8 +414,52 @@ def install_model(
             if actual != expected:
                 raise RuntimeError(f"{label} 校验失败（期望 {expected[:12]}…，实际 {actual[:12]}…）")
 
+    register_weight_hashes([str(f["path"]) for f in files])
     report("done", 1.0, f"{name} 下载完成")
     return {"name": name, "files": [str(f["path"]) for f in files]}
+
+
+def register_weight_hashes(rel_paths: list[str]) -> list[str]:
+    """把刚下载的权重登记进完整性清单 ``data/weight_manifest.json``。
+
+    原生引擎的加载校验是「清单里没有 + allow_unregistered_weights=false ⇒ 拒绝加载」，
+    而下载链路此前只落盘不登记 —— 用户页内下完官方权重后一开跑就报
+    「权重未在完整性清单登记」。这里在下载成功后补登记（只对本地已存在的文件算 hash）。
+
+    Returns:
+        实际登记（或更新）的清单键列表。
+    """
+    manifest_rel = "data/weight_manifest.json"
+    manifest_path = os.path.join(PROJECT_ROOT, manifest_rel)
+    data: dict = {}
+    if os.path.isfile(manifest_path):
+        try:
+            with open(manifest_path, encoding="utf-8") as handle:
+                loaded = json.load(handle)
+            if isinstance(loaded, dict):
+                data = loaded
+        except Exception:  # noqa: BLE001 —— 清单损坏时重建，不阻塞下载
+            data = {}
+    files_map = data.get("files")
+    if not isinstance(files_map, dict):
+        files_map = {}
+    updated: list[str] = []
+    for rel in rel_paths:
+        key = str(rel).replace("\\", "/")
+        full = os.path.join(PROJECT_ROOT, key)
+        if not os.path.isfile(full):
+            continue
+        files_map[key] = _sha256(full)
+        updated.append(key)
+    if not updated:
+        return []
+    data["files"] = files_map
+    data.setdefault("generator", "download_service.install_model")
+    data["generated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    os.makedirs(os.path.dirname(manifest_path), exist_ok=True)
+    with open(manifest_path, "w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+    return updated
 
 
 # ---------------------------------------------------------------- 卸载 ----

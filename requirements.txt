@@ -81,3 +81,9 @@ sentencepiece>=0.1.99
 transformers>=5.17.0
 accelerate>=1.15.0
 comfy-aimdo>=0.5.5
+
+# 推理必需但此前只在 requirements-lock.txt 里（2026-11-01 补齐声明）：
+# 三者都依赖 torch，属「Full 形态」依赖，引导解释器打包时按 skipNames 跳过
+torchsde==0.2.6
+comfy-kitchen==0.2.31
+timm==1.0.28

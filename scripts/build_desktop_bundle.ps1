@@ -239,7 +239,7 @@ if ($buildSlim) {
         # 否则 pip 会顺手把 CPU 版 torch 装回来，判定与体积双输。
         $reqSrc = Join-Path $Root 'requirements.txt'
         $reqNoTorch = Join-Path $StagingDir 'requirements-notorch.txt'
-        $skipNames = @('torch', 'torchvision', 'torchaudio', 'clip-anytorch', 'controlnet-aux', 'accelerate')
+        $skipNames = @('torch', 'torchvision', 'torchaudio', 'clip-anytorch', 'controlnet-aux', 'accelerate', 'torchsde', 'comfy-kitchen', 'comfy-aimdo', 'timm')
         $lines = @()
         foreach ($line in [System.IO.File]::ReadAllLines($reqSrc)) {
             $s = $line.Trim()

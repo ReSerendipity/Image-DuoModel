@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -31,11 +32,17 @@ def _run(*extra: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_gate_passes_on_current_tree():
-    """仓库当前清单必须与检出代码一致（清单过期入库即在此拦截）。"""
+    """仓库当前清单必须与检出代码一致（清单过期入库即在此拦截）。
+
+    断言「N/N」两侧相等而非钉死具体数字：清单覆盖的模块数随安全模块增减
+    演进（33→35），数字钉死会造成每次登记新模块都要改测试的假红。
+    """
     r = _run()
     assert r.returncode == 0, f"门禁应 PASS: {r.stdout}\n{r.stderr}"
     assert "[PASS]" in r.stdout
-    assert "33/33" in r.stdout
+    m = re.search(r"(\d+)/(\d+)\s*模块", r.stdout)
+    assert m, f"输出缺少 N/N 模块统计: {r.stdout!r}"
+    assert m.group(1) == m.group(2), f"清单覆盖数与通过数不一致: {r.stdout!r}"
 
 
 def test_gate_fails_closed_when_selfcheck_missing():

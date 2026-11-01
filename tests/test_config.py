@@ -53,9 +53,9 @@ class TestConfigLoading:
         assert "server" in config_yaml
         assert "models" in config_yaml
 
-    def test_app_config_builds(self, app_config):
-        """AppConfig 构建成功"""
-        assert app_config.version == "2.1.1"
+    def test_app_config_builds(self, app_config, config_yaml):
+        """AppConfig 构建成功；版本号与 config.yaml 权威位一致（不钉死具体值）"""
+        assert app_config.version == str(config_yaml["version"])
         assert app_config.server.host == "127.0.0.1"
         assert app_config.server.port == 8288
         assert app_config.models.model_source_mode in ("shared", "portable")

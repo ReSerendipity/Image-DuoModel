@@ -269,7 +269,8 @@ const click = (d, target) => {
     await sleep(300);
     assert(errors.length === 0, 'init no errors');
     const iconBtns = [...d.querySelectorAll('.topbar .icon-btn')];
-    assert(iconBtns.length >= 4 && iconBtns.every(b => b.tagName === 'BUTTON'), 'topbar buttons are buttons');
+    // 顶栏控件必须是真交互元素：<button> 或导航 <a href>（下载管理入口是链接；壳窗控钮已走原生标题栏，GOTCHAS #68）
+    assert(iconBtns.length >= 4 && iconBtns.every(b => b.tagName === 'BUTTON' || (b.tagName === 'A' && b.getAttribute('href'))), 'topbar buttons are buttons');
     assert(d.getElementById('genBtn').tagName === 'BUTTON', 'generate is a button');
     assert(d.getElementById('posPrompt').tagName === 'TEXTAREA', 'prompt is textarea');
     const viewerBtns = [...d.querySelectorAll('#viewer .v-tools button')];

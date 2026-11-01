@@ -134,7 +134,9 @@ def _make_runtime(tmp_path: Path, meta: bool, torch: bool = False) -> Path:
     runtime = tmp_path / "bootstrap"
     (root).mkdir(parents=True, exist_ok=True)
     runtime.mkdir(parents=True, exist_ok=True)
-    (runtime / "python.exe").write_bytes(b"")
+    # 解释器文件名随平台（Windows=python.exe / POSIX=python），与 _exe_name() 一致，
+    # 否则 Linux CI 上 _has_python() 恒 False、_runtime_dir() 永远落到 runtime 回退位
+    (runtime / ds._exe_name()).write_bytes(b"")
     if torch:
         site = runtime / "Lib" / "site-packages" / "torch"
         site.mkdir(parents=True, exist_ok=True)
@@ -165,10 +167,10 @@ def test_uninstall_keeps_interpreter_when_in_use(tmp_path, monkeypatch) -> None:
     """后端正跑在 bootstrap 里时不能删目录，只删 torch 家族与 RUNTIME.json。"""
     runtime = _make_runtime(tmp_path, meta=True, torch=True)
     monkeypatch.setattr(ds, "PROJECT_ROOT", str(tmp_path / "app"))
-    monkeypatch.setattr(ds.sys, "executable", str(runtime / "python.exe"), raising=False)
+    monkeypatch.setattr(ds.sys, "executable", str(runtime / ds._exe_name()), raising=False)
     result = ds.uninstall_runtime()
     assert result["in_use"] is True
-    assert (runtime / "python.exe").exists(), "正在使用的解释器不能被删掉"
+    assert (runtime / ds._exe_name()).exists(), "正在使用的解释器不能被删掉"
     assert not (runtime / "RUNTIME.json").exists()
     assert not (runtime / "Lib" / "site-packages" / "torch").exists()
 
@@ -177,7 +179,7 @@ def test_runtime_dir_prefers_runtime_over_bootstrap(tmp_path, monkeypatch) -> No
     root = tmp_path / "app"
     root.mkdir()
     (tmp_path / "runtime").mkdir()
-    (tmp_path / "runtime" / "python.exe").write_bytes(b"")
+    (tmp_path / "runtime" / ds._exe_name()).write_bytes(b"")
     _make_runtime(tmp_path, meta=False)
     monkeypatch.setattr(ds, "PROJECT_ROOT", str(root))
     assert Path(ds._runtime_dir()) == tmp_path / "runtime"

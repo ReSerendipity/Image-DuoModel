@@ -6,7 +6,7 @@
 #     （accelerate/diffusers/transformers/comfy-kitchen/comfy-aimdo/controlnet_aux/
 #      scikit-image/timm/tokenizers/sentencepiece/torchsde 等推理必需包）。
 #   - frozen 快照的本地 CUDA wheel 条目（torch 2.13.0+cu132）不引入，
-#     与本文件 torch==2.14.0 声明冲突；历史事实见下方「版本漂移提示」。
+#     与本文件 torch==2.15.0 声明冲突；历史事实见下方「版本漂移提示」。
 #   - 被引用方：app/clean_launch.py（缺失依赖安装）、scripts/build_release_metadata.py
 #     （SBOM）、scripts/package_app.py（打包）、THIRD_PARTY_NOTICES.md（许可扫描）。
 # 合并调整：filelock 由 lock 原 4.0.1 回退至 3.32.3（补入包依赖 <4，pip 解析不可用）。
@@ -161,10 +161,10 @@ timm==1.0.28
 tokenizers==0.23.1
 tomli==2.4.1
 tomli_w==1.2.0
-torch==2.14.0
-torchaudio==2.11.0
+torch==2.15.0
+torchaudio==2.11.1
 torchsde==0.2.6
-torchvision==0.29.0
+torchvision==0.29.2
 tqdm==4.70.1
 traitlets==5.16.1
 trampoline==0.1.2

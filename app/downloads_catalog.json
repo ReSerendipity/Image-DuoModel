@@ -3,29 +3,26 @@
   "runtime": {
     "version": "1",
     "tag": "runtime-v1",
-    "base_url": "http://127.0.0.1:8901",
+    "base_url": "https://github.com/ReSerendipity/Image-DuoModel/releases/download/runtime-v1",
     "python": "3.12.10",
     "torch": "2.10.0+cu128",
     "cuda": "cu128",
     "packages": [
       "torch==2.10.0",
-      "torchvision==0.25.0"
+      "torchvision==0.25.0",
+      "torchsde==0.2.6",
+      "comfy-kitchen==0.2.31",
+      "comfy-aimdo==0.5.5",
+      "timm==1.0.28"
     ],
-    "size_bytes": 2907703294,
-    "built_at": "2026-11-01T01:50:20Z",
+    "size_bytes": 3123778245,
+    "built_at": "2026-11-01T07:18:22Z",
     "min_app_version": "2.1.1",
-    "volumes": [
-      {
-        "name": "ImageMultiModel-Runtime-cu128.zip.001",
-        "size": 1992294400,
-        "sha256": "c402ae057856474f2cca0c9e9c9b6232e2a7129c798da6dc8a3e35b456977121"
-      },
-      {
-        "name": "ImageMultiModel-Runtime-cu128.zip.002",
-        "size": 915408894,
-        "sha256": "87365ef36fe24a85da321b04a01a01ce1b99aeaad5a0f77ff6132a0abd74e3ce"
-      }
-    ]
+    "volumes": [],
+    "install_mode": "online",
+    "index_url": "https://download.pytorch.org/whl/cu128",
+    "pip_extra_index": "https://pypi.tuna.tsinghua.edu.cn/simple",
+    "note": "install_mode=online：页内点安装时后端直接 pip 官方索引安装 （torch 家族 + 生态包），无需下载预置分卷。"
   },
   "models": [
     {

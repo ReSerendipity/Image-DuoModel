@@ -27,5 +27,29 @@
       }
     ]
   },
-  "models": []
+  "models": [
+    {
+      "name": "z_image_turbo",
+      "display_name": "Z-Image Turbo（官方 Z-Image，int8/fp8）",
+      "source": "hf-mirror:Comfy-Org/Z-Image",
+      "size_bytes": 12168000000,
+      "files": [
+        {
+          "path": "pretrained_models/unet/Z-image-turbo/z_image_int8_convrot.safetensors",
+          "url": "https://hf-mirror.com/Comfy-Org/Z-Image/resolve/main/split_files/diffusion_models/z_image_int8_convrot.safetensors",
+          "size": 6201000000
+        },
+        {
+          "path": "pretrained_models/text_encoders/Z_image(turbo)/qwen_3_4b_fp8_mixed.safetensors",
+          "url": "https://hf-mirror.com/Comfy-Org/Z-Image/resolve/main/split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+          "size": 5632000000
+        },
+        {
+          "path": "pretrained_models/vae/Z_image(turbo)/ae.safetensors",
+          "url": "https://hf-mirror.com/Comfy-Org/Z-Image/resolve/main/split_files/vae/ae.safetensors",
+          "size": 335000000
+        }
+      ]
+    }
+  ]
 }

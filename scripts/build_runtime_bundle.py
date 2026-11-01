@@ -64,6 +64,8 @@ def download_wheels(
             *reqs,
             "--index-url",
             index_url,
+            "--extra-index-url",
+            "https://pypi.org/simple",
             "--only-binary=:all:",
             "--implementation",
             "cp",

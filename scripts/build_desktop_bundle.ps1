@@ -415,7 +415,7 @@ if ($buildRuntime) {
     $env:PIP_CONFIG_FILE = 'NUL'
     try {
         & $dlPython -m pip download "torch==$TorchVersion" "torchvision==$TorchvisionVersion" `
-            --index-url $TorchIndexUrl -d $wheels --no-warn-script-location
+            --index-url $TorchIndexUrl -d $wheels
     } finally {
         $env:PIP_CONFIG_FILE = $prevCfg
     }

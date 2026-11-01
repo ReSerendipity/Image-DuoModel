@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.2.0](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.2...v2.2.0) (2026-11-01)
+
+
+### Features
+
+* **desktop:** 原生标题栏 + 单文件安装包 ([a7d01ad](https://github.com/ReSerendipity/Image-DuoModel/commit/a7d01ad399541c486e0944c63acffbe4197d7a84))
+* **desktop:** 瘦包 + 程序内下载管理（引导态全链路真机口径） ([447d423](https://github.com/ReSerendipity/Image-DuoModel/commit/447d423f99bb98c901361dd86571c87f6eeb821d))
+* **downloads:** 环境包产线修复与补齐（runtime-v1） ([4045b97](https://github.com/ReSerendipity/Image-DuoModel/commit/4045b97175c9960ca6286bbe5ad48803bf372619))
+* **models:** 默认引擎切回官方权重 + 模型清单指官方源 ([aa11bdd](https://github.com/ReSerendipity/Image-DuoModel/commit/aa11bdd878bd4295250b4c27b942f9539a7236dd))
+* **runtime:** 安装模式切「在线拉官方索引」，不再托管 GB 级环境包 ([e9e82fa](https://github.com/ReSerendipity/Image-DuoModel/commit/e9e82fab582dae0e637f9ec4d050c6166c3a45e8))
+
+
+### Bug Fixes
+
+* **build:** runtime 离线包 pip download 增加 pypi.org 兜底索引 ([fbb4efe](https://github.com/ReSerendipity/Image-DuoModel/commit/fbb4efe9675d2b144acdc693a41dbed441007eba))
+* **build:** 完整性公钥必须进卷；补独立版 7za ([da2dfe8](https://github.com/ReSerendipity/Image-DuoModel/commit/da2dfe8290e7e7cea4bddeff685aa631b8492f5a))
+* **ci:** 文档引用门禁不再把「禁止入库」清单与外部仓模板判为失效引用 ([6012ae9](https://github.com/ReSerendipity/Image-DuoModel/commit/6012ae90e7b1cb4c0876b91b419cb9924bf76dd7))
+* **ci:** 生产晋级在缺目标主机时硬失败，不再在托管 runner 上空转 ([d07f61e](https://github.com/ReSerendipity/Image-DuoModel/commit/d07f61ec1cf9827ab6531b1f92180bd75fce8f95))
+* **deps:** 升级 filelock / virtualenv / python-discovery / setuptools，清 19 个告警 ([cc3d8e1](https://github.com/ReSerendipity/Image-DuoModel/commit/cc3d8e172f3bfcbda933f282b2e7215cb30ccdec))
+* **desktop:** 壳版本三处镜像对齐并统一自适应 CSRF 优雅关闭 ([d2d6efa](https://github.com/ReSerendipity/Image-DuoModel/commit/d2d6efad1b25f03a5a3da61ec02529eb96b10538))
+* **models:** 下载后自动登记完整性清单 + 补齐 torch 生态推理依赖 ([0d69c57](https://github.com/ReSerendipity/Image-DuoModel/commit/0d69c57f4f8e2065be8975beec767c6fd38b20e8))
+
 ## [2.1.2](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.1...v2.1.2) (2026-10-29)
 
 

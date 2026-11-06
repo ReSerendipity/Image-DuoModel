@@ -101,7 +101,7 @@ networkx==3.7
 nodeenv==1.10.0
 numpy==2.5.3
 nvidia-ml-py==13.610.43
-omegaconf==2.3.1
+omegaconf==2.4.0
 opencc-python-reimplemented==0.1.7
 opencv-python-headless==5.0.0.93
 packageurl-python==0.17.6
@@ -168,7 +168,7 @@ torchvision==0.29.0
 tqdm==4.70.1
 traitlets==5.16.1
 trampoline==0.1.2
-transformers==5.17.0
+transformers==5.22.0
 typer==0.27.1
 typing-inspection==0.4.4
 typing_extensions==4.16.0

@@ -4,9 +4,9 @@
 # ── 深度学习框架（必需：GPU 推理 + 显存检测）────────────────
 # 注：推荐通过 install.bat 一键安装 CUDA 版本：
 #   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-torch>=2.14.0
-torchvision>=0.29.0
-torchaudio>=2.4.0
+torch>=2.15.0
+torchvision>=0.29.2
+torchaudio>=2.11.1
 
 # ── Web 框架 ──────────────────────────────────────────────
 fastapi>=0.143.0

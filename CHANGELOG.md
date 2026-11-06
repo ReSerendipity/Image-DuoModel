@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.2.0...v2.3.0) (2026-11-03)
+
+
+### Features
+
+* **about:** 关于抽屉补充魔搭与知乎入口 ([cfd1b8b](https://github.com/ReSerendipity/Image-DuoModel/commit/cfd1b8b48faa530205fcefc6d335143ae22f1b8d))
+* **about:** 关于抽屉补充魔搭与知乎入口 ([950263d](https://github.com/ReSerendipity/Image-DuoModel/commit/950263dd7b0dd7d6d0cdc9fef59f043a4208d23e))
+
+
+### Reverts
+
+* 运维验证脚本移回 scripts/（非 pytest 测试） ([af15847](https://github.com/ReSerendipity/Image-DuoModel/commit/af15847d94454d2ae080d5cf7750445fc2ab2f5e))
+
 ## [2.2.0](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.1.2...v2.2.0) (2026-11-01)
 
 

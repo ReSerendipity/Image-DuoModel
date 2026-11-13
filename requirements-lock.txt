@@ -152,7 +152,7 @@ shellingham==1.5.4
 six==1.17.0
 sortedcontainers==2.4.0
 soundfile==0.14.0
-soupsieve==2.9.2
+soupsieve==4.0
 starlette==1.7.0
 sympy==1.14.0
 text-unidecode==1.3

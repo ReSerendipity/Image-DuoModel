@@ -8,7 +8,7 @@
     "test:frontend": "node frontend/smoke.js && node frontend/agent_chat.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
-    "jsdom": "^30.1.2"
+    "@playwright/test": "^1.64.1",
+    "jsdom": "^30.1.3"
   }
 }

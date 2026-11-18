@@ -59,8 +59,11 @@ def enforce_upload_limits(
         logger.debug("[UPLOAD-LIMIT] 无法读取图像尺寸，跳过像素预检")
         return
     finally:
-        # 恢复为显式上限（阈值 ×2，正常图不会触发），保留进程级纵深防御。
-        Image.MAX_IMAGE_PIXELS = max_pixels
+        # 还原进入本函数前的进程级限幅，不泄漏本调用的阈值。
+        # （2026-11-19 修复：原来 finally 无条件改写为 max_pixels，首次上传后
+        #   整个进程的 PIL 限幅就停留在应用阈值上——CI 全量回归里后续测试
+        #   文件的小图被 DecompressionBombError 误杀，5 个用例连坐失败。）
+        Image.MAX_IMAGE_PIXELS = prev_limit
 
     if width * height > max_pixels:
         msg = f"Uploaded image pixel count {width * height} exceeds limit {max_pixels}"

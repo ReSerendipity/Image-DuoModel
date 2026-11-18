@@ -93,6 +93,9 @@ jobs:
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
           output: "trivy-report.txt"
+          # trivy ≥0.70 不再自动读取仓库根的 .trivyignore；新版 action 用
+          # trivyignores 入参显式传入（旧 ignore-file 入参不支持，见 562ee2c）。
+          trivyignores: ".trivyignore"
 
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4

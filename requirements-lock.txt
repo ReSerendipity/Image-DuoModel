@@ -56,7 +56,7 @@ comfy-aimdo==0.5.5
 comfy-kitchen==0.2.31
 controlnet_aux==0.0.10
 coverage==7.16.2
-cryptography==50.0.1
+cryptography==50.0.2
 cyclonedx-python-lib==11.12.0
 defusedxml==0.7.1
 diffusers==0.39.0

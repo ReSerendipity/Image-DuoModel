@@ -92,6 +92,7 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
+          ignore-file: ".trivyignore.yaml"
           output: "trivy-report.txt"
 
       - name: Upload Trivy report

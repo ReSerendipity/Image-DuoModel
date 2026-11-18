@@ -1,0 +1,7 @@
+# §10.4 豁免登记（在途修复，2026-12-18 前必须移除本文件恢复全量阻断）
+# zip：传递依赖（requirements.txt 未直接声明），直接 pin >=9.0.5 需先确认父包约束；升级 PR 随 dependabot 跟进。
+# zlib1g：debian 13.7 基础镜像点更新（deb13u1）后消失（base image tag 刷新在途）。
+# 注：pinned trivy-action 的默认 --ignorefile 即本文件，YAML 形式（含 Expired 字段）在该版不可用。
+CVE-2026-115905
+CVE-2026-115909
+CVE-2026-85091

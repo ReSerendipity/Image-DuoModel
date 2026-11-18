@@ -1,0 +1,12 @@
+# §10.4 豁免登记：逐条理由 + expiration（过期自动恢复阻断）
+# zip：传递依赖（requirements.txt 未直接声明），直接 pin >=9.0.5 需先确认父包约束；
+#      升级 PR 随 dependabot 跟进。zlib1g：debian 13.7 基础镜像点更新（deb13u1）在途。
+- id: CVE-2026-115905
+  # zip 2.4.2 CRITICAL（修复版 9.0.5）：传递依赖，父包约束确认后 pin
+  Expired: 2026-12-18T00:00:00Z
+- id: CVE-2026-115909
+  # zip 2.4.2/4.6.1 HIGH（修复版 9.0.0）
+  Expired: 2026-12-18T00:00:00Z
+- id: CVE-2026-85091
+  # zlib1g HIGH：基础镜像 python:3.12-slim 点更新后消失
+  Expired: 2026-12-18T00:00:00Z

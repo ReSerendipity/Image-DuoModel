@@ -36,6 +36,13 @@ updates:
       # refresh both together once upstream sympy lifts the cap.
       - dependency-name: "mpmath"
       - dependency-name: "antlr4-python3-runtime"
+      # omegaconf 2.4.x 与 hydra-core 1.3.8 互斥（hydra-core 1.3.8 requires_dist:
+      # "omegaconf<2.4"）。2026-11-19 采纳 #174 时 dependabot 只动了 omegaconf 段
+      # （>=2.3.0 → >=2.4.0），hydra-core 未跟，锁回 2.4.0 与 hydra-core 冲突。
+      # 与上面三对同类：成对 ignore，等 hydra-core 放开 omegaconf>=2.4 上界后
+      # 一并解除。
+      - dependency-name: "omegaconf"
+      - dependency-name: "hydra-core"
     groups:
       # 显式分族，取代 patterns: ["*"]。blanket 分组会把互有强约束的针卷进同一次
       # "全选"升级并各走各的：6e9de9c 与 b709767 两次都因此把锁变成不可解

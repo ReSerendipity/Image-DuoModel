@@ -610,8 +610,10 @@ pub fn extract_zip_with(zip_path: &Path, dest: &Path, on_progress: &dyn Fn(u8)) 
     let mut last_emit = 0u8;
     for i in 0..total {
         let mut entry = archive.by_index(i).context("读取 zip 条目失败")?;
-        let Some(target) = safe_join(dest, entry.name()) else {
-            return Err(anyhow!("更新包含非法路径条目: {}", entry.name()));
+        // zip 9 起 name() 返回 Result<Cow<str>>（文件名可能带非法 UTF-8/编码异常）
+        let entry_name = entry.name().context("读取 zip 条目名失败")?;
+        let Some(target) = safe_join(dest, &entry_name) else {
+            return Err(anyhow!("更新包含非法路径条目: {}", entry_name));
         };
         if entry.is_dir() {
             fs::create_dir_all(&target)?;
@@ -1117,8 +1119,8 @@ mod tests {
         let zpath = dir.join("t.zip");
         let file = File::create(&zpath).unwrap();
         let mut writer = zip::ZipWriter::new(file);
-        let opts: zip::write::FileOptions<'_, ()> =
-            zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let opts = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated);
         writer.start_file("start_portable.py", opts).unwrap();
         writer.write_all(b"print(1)").unwrap();
         writer.add_directory("configs_3b/", opts).unwrap();

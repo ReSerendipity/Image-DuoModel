@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.1](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.3.0...v2.3.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* **deps:** 修正 [#174](https://github.com/ReSerendipity/Image-DuoModel/issues/174) 采纳的回归——恢复 main 侧五包原值，仅保留 model-tooling 三项 ([183c4e3](https://github.com/ReSerendipity/Image-DuoModel/commit/183c4e31785b370173054af9c834783b9dd87816))
+* **deps:** 恢复 [#174](https://github.com/ReSerendipity/Image-DuoModel/issues/174) 采纳中被静默降级的五包（rebase 吞掉的修正重放） ([cfbcb9e](https://github.com/ReSerendipity/Image-DuoModel/commit/cfbcb9e2ca2134a968740988a27b9f60de972b21))
+* **security:** upload_limits 恢复 prev_limit + Trivy 显式传 trivyignores ([b969d06](https://github.com/ReSerendipity/Image-DuoModel/commit/b969d063fbf184859cef0ed328193ebfc51c1dab))
+
 ## [2.3.0](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.2.0...v2.3.0) (2026-11-17)
 
 

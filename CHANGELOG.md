@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.3.1...v2.3.2) (2026-11-21)
+
+
+### Bug Fixes
+
+* **security:** zip crate 2.4.2→9.7.3 消两项镜像 CVE（§10.4 在途项落地） ([30dd558](https://github.com/ReSerendipity/Image-DuoModel/commit/30dd5580c6d714e3421b7b796644686956c0260b))
+
 ## [2.3.1](https://github.com/ReSerendipity/Image-DuoModel/compare/v2.3.0...v2.3.1) (2026-11-19)
 
 
